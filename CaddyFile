@@ -1,0 +1,102 @@
+{
+        email vovochkastelmashchuk@gmail.com
+        storage file_system {
+                root /caddy_storage/
+        }
+}
+
+mixdrinks.org {
+        reverse_proxy * 0.0.0.0:40001
+
+        log {
+                output file /var/log/caddy/mixdrinks/logs.log
+                format json
+        }
+}
+
+www.mixdrinks.org {
+        encode {
+                gzip {
+                        level 6
+                }
+                zstd {
+                        level 12
+                }
+        }
+        reverse_proxy * 0.0.0.0:40001
+
+        log {
+                output file /var/log/caddy/mixdrinks/www.log
+                format json
+        }
+}
+
+ypod.stelmashchuk.dev {
+        reverse_proxy * 0.0.0.0:6002
+}
+
+http://ypod.stelmashchuk.dev {
+        reverse_proxy * 0.0.0.0:6002
+}
+
+androidstory.dev {
+        redir https://hardandsoft.stelmashchuk.dev{uri}
+}
+
+hardandsoft.stelmashchuk.dev {
+        rewrite /files/rss.xml /api/podcast/android-story/rss.xml
+        rewrite /rss.xml /api/podcast/android-story/rss.xml
+
+        reverse_proxy * 0.0.0.0:6002 {
+                header_up Host "hardandsoft.stelmashchuk.dev"
+                header_up X-Real-IP {remote_host}
+        }
+
+        log {
+                output file /var/log/caddy/hardandsoft/https.log
+                format json
+        }
+}
+
+http://hardandsoft.stelmashchuk.dev {
+        rewrite /files/rss.xml /api/podcast/android-story/rss.xml
+        rewrite /rss.xml /api/podcast/android-story/rss.xml
+
+        reverse_proxy * 0.0.0.0:6002 {
+                header_up Host "hardandsoft.stelmashchuk.dev"
+                header_up X-Real-IP {remote_host}
+        }
+
+        log {
+                output file /var/log/caddy/hardandsoft/http.log
+                format json
+        }
+}
+
+podcast.stelmashchuk.dev {
+        reverse_proxy * 0.0.0.0:6002 {
+                header_up Host "podcast.stelmashchuk.dev"
+                header_up X-Real-IP {remote_host}
+        }
+}
+
+nest2d.stelmashchuk.dev {
+        reverse_proxy * 0.0.0.0:7100
+
+        log {
+                output file /var/log/caddy/nest2d/logs.log
+                format json
+        }
+}
+
+kickstart.stelmashchuk.dev {
+        reverse_proxy * 0.0.0.0:10001
+        log {
+                output file /var/log/caddy/kickstart/logs.log
+                format json
+        }
+}
+
+nest2d.online {
+        redir https://nest2d.stelmashchuk.dev
+}
