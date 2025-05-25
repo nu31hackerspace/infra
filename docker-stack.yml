@@ -11,7 +11,7 @@ services:
       mode: global
   
   mongo-backup:
-    image: ghcr.io/vovastelmashchuk/nest2d:${GIT_COMMIT_SHA:-latest}
+    image: ghcr.io/vovastelmashchuk/mongo-backup:${GIT_COMMIT_SHA:-latest}
     command: ["/usr/local/bin/backup.sh"]
     depends_on:
       - cron

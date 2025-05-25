@@ -36,8 +36,8 @@ jobs:
           context: ./backup
           push: true
           tags: |
-            ${{ env.REGISTRY }}/mongobackup:latest
-            ${{ env.REGISTRY }}/mongobackup:${{ github.sha }}
+            ${{ env.REGISTRY }}/vovastelmashchuk/mongo-backup:latest
+            ${{ env.REGISTRY }}/vovastelmashchuk/mongo-backup:${{ github.sha }}
 
   deploy:
     runs-on: ubuntu-latest
