@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  cron:
+    image: crazymax/swarm-cronjob:1.14.0
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TZ=UTC
+    deploy:
+      mode: global
+  
+  mongo-backup:
+    image: mongo-backup:local
+    command: ["/usr/local/bin/backup.sh"]
+    depends_on:
+      - cron
+    environment:
+      - R2_ACCOUNT_ID=e4b7665fe955c028355a0e2f9e847b98
+      - R2_BUCKET=mongobackup
+    secrets:
+      - mongo_uri
+      - r2_backup_access_key_id
+      - r2_backup_secret_access_key
+    deploy:
+      labels:
+        - "swarm.cronjob.enable=true"
+        - "swarm.cronjob.schedule=* * * * *"
+        - "swarm.cronjob.skip-running=true"
+      replicas: 0
+      restart_policy:
+        condition: none
+
+secrets:
+  mongo_uri:
+    external: true
+  r2_backup_access_key_id:
+    external: true
+  r2_backup_secret_access_key:
+    external: true 
