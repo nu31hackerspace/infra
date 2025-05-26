@@ -41,10 +41,10 @@ services:
       update_config:
         order: start-first
       restart_policy:
-        condition: on-failure       
-        delay: 10s                  
-        max_attempts: 3             
-        window: 60s                 
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 60s
 
   mongo-backup-hourly:
     image: ghcr.io/vovastelmashchuk/mongo-backup:${GIT_COMMIT_SHA:-latest}
