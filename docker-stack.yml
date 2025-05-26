@@ -29,7 +29,7 @@ services:
     ports:
       - "2017:27017"
     volumes:
-      - /opt/mongo-data:/data/db
+      - /opt/mongodb-data:/data/db
     secrets:
       - mongo_root_username
       - mongo_root_password
