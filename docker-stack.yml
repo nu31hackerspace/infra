@@ -98,3 +98,5 @@ secrets:
     external: true
   r2_backup_secret_access_key:
     external: true 
+  mongo_express_basic_pass:
+    external: true
