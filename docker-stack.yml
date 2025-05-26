@@ -28,6 +28,7 @@ services:
     image: mongo:7.0.6
     ports:
       - "2017:27017"
+      - "27017:27017"
     volumes:
       - /opt/mongodb-data:/data/db
     secrets:
