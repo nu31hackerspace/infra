@@ -10,6 +10,20 @@ services:
     deploy:
       mode: global
   
+  prune-nodes:
+    image: docker
+    command: ["docker", "system", "prune", "-f"]
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    deploy:
+      mode: global
+      labels:
+        - "swarm.cronjob.enable=true"
+        - "swarm.cronjob.schedule=0 */5 * * * *"
+        - "swarm.cronjob.skip-running=false"
+      restart_policy:
+        condition: none
+
   mongo-backup-hourly:
     image: ghcr.io/vovastelmashchuk/mongo-backup:${GIT_COMMIT_SHA:-latest}
     command: ["/usr/local/bin/backup.sh"]
