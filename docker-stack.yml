@@ -10,7 +10,7 @@ services:
     deploy:
       mode: global
   
-  mongo-backup:
+  mongo-backup-hourly:
     image: ghcr.io/vovastelmashchuk/mongo-backup:${GIT_COMMIT_SHA:-latest}
     command: ["/usr/local/bin/backup.sh"]
     depends_on:
@@ -18,6 +18,7 @@ services:
     environment:
       - R2_ACCOUNT_ID=e4b7665fe955c028355a0e2f9e847b98
       - R2_BUCKET=mongobackup
+      - BACKUP_FOLDER=hourly
     secrets:
       - mongo_uri
       - r2_backup_access_key_id
@@ -26,6 +27,50 @@ services:
       labels:
         - "swarm.cronjob.enable=true"
         - "swarm.cronjob.schedule=0 * * * *"
+        - "swarm.cronjob.skip-running=true"
+      replicas: 0
+      restart_policy:
+        condition: none
+  
+  mongo-backup-daily:
+    image: ghcr.io/vovastelmashchuk/mongo-backup:${GIT_COMMIT_SHA:-latest}
+    command: ["/usr/local/bin/backup.sh"]
+    depends_on:
+      - cron
+    environment:
+      - R2_ACCOUNT_ID=e4b7665fe955c028355a0e2f9e847b98
+      - R2_BUCKET=mongobackup
+      - BACKUP_FOLDER=daily
+    secrets:
+      - mongo_uri
+      - r2_backup_access_key_id
+      - r2_backup_secret_access_key
+    deploy:
+      labels:
+        - "swarm.cronjob.enable=true"
+        - "swarm.cronjob.schedule=30 3 * * *"
+        - "swarm.cronjob.skip-running=true"
+      replicas: 0
+      restart_policy:
+        condition: none
+
+  mongo-backup-weekly:
+    image: ghcr.io/vovastelmashchuk/mongo-backup:${GIT_COMMIT_SHA:-latest}
+    command: ["/usr/local/bin/backup.sh"]
+    depends_on:
+      - cron
+    environment:
+      - R2_ACCOUNT_ID=e4b7665fe955c028355a0e2f9e847b98
+      - R2_BUCKET=mongobackup
+      - BACKUP_FOLDER=weekly
+    secrets:
+      - mongo_uri
+      - r2_backup_access_key_id
+      - r2_backup_secret_access_key
+    deploy:
+      labels:
+        - "swarm.cronjob.enable=true"
+        - "swarm.cronjob.schedule=20 3 * * 2"
         - "swarm.cronjob.skip-running=true"
       replicas: 0
       restart_policy:

@@ -22,8 +22,9 @@ fi
 : "${MONGO_URI:?need to set MONGO_URI}"
 : "${R2_ACCOUNT_ID:?need to set R2_ACCOUNT_ID}"
 : "${R2_BUCKET:?need to set R2_BUCKET}"
+: "${BACKUP_FOLDER:?need to set BACKUP_FOLDER}"
 
-TS="$(date +'%Y-%m-%d_%H%M')"
+TS="$(date +'%Y-%m-%d_%H-%M')"
 ARCHIVE="/tmp/mongodump-${TS}.gz"
 
 echo "[+] Dumping MongoDB → ${ARCHIVE}"
@@ -37,6 +38,6 @@ aws \
   --endpoint-url="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com" \
   s3 cp \
     "${ARCHIVE}" \
-    "s3://${R2_BUCKET}/backups/mongodump-${TS}.gz"
+    "s3://${R2_BUCKET}/${BACKUP_FOLDER}/mongodump-${TS}.gz"
 
 echo "[+] Done." 
