@@ -69,6 +69,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - build-and-push-mongo-backup
+      - build-and-push-caddy
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
