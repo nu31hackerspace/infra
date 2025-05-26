@@ -81,8 +81,10 @@ services:
     ports:
       - "8081:8081"
     environment:
-      - ME_CONFIG_MONGODB_ENABLE_ADMIN=false
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
       - ME_CONFIG_MONGODB_URL_FILE=/run/secrets/mongo_uri
+      - ME_CONFIG_BASICAUTH_USERNAME_FILE=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD_FILE=/run/secrets/mongo_express_basic_pass
     secrets:
       - mongo_uri
     deploy:
