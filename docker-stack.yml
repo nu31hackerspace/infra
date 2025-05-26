@@ -87,6 +87,8 @@ services:
       - ME_CONFIG_BASICAUTH_PASSWORD_FILE=/run/secrets/mongo_express_basic_pass
     secrets:
       - mongo_uri
+      - mongo_express_basic_pass
+      - mongo_express_basic_user
     deploy:
       update_config:
         order: start-first
