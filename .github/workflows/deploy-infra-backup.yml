@@ -60,7 +60,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
-          context: ./backup
+          context: ./caddy
           push: true
           tags: |
             ${{ env.REGISTRY }}/vovastelmashchuk/caddy:latest
