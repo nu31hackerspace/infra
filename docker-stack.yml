@@ -95,20 +95,32 @@ services:
     ports:
       - "8081:8081"
     environment:
-      - ME_CONFIG_MONGODB_URL_FILE=/run/secrets/mongo_uri
+      - ME_CONFIG_MONGODB_URL=mongodb://167.235.52.168:27017/?authSource=admin
       - ME_CONFIG_BASICAUTH_ENABLED=true
       - ME_CONFIG_BASICAUTH_USERNAME_FILE=/run/secrets/mongo_express_basic_user
       - ME_CONFIG_BASICAUTH_PASSWORD_FILE=/run/secrets/mongo_express_basic_pass
       - ME_CONFIG_SITE_GRIDFS_ENABLED=true
     secrets:
+      - mongo_user
+      - mongo_pass
       - mongo_uri
       - mongo_express_basic_pass
       - mongo_express_basic_user
     deploy:
       update_config:
         order: start-first
-
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        export ME_CONFIG_MONGODB_AUTH_USERNAME=$(cat /run/secrets/mongo_user) \
+        && export ME_CONFIG_MONGODB_AUTH_PASSWORD=$(cat /run/secrets/mongo_pass) \
+        && exec /docker-entrypoint.sh
 secrets:
+  mongo_user:
+    external: true
+  mongo_pass:
+    external: true
   mongo_uri:
     external: true
   r2_backup_access_key_id:
