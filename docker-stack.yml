@@ -36,6 +36,9 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME_FILE=/run/secrets/mongo_root_username
       - MONGO_INITDB_ROOT_PASSWORD_FILE=/run/secrets/mongo_root_password
+    deploy:
+      update_config:
+        order: start-first
 
   mongo-backup-hourly:
     image: ghcr.io/vovastelmashchuk/mongo-backup:${GIT_COMMIT_SHA:-latest}
