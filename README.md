@@ -34,3 +34,17 @@ Add all secrets localy and run the docker-stack.local.yml
 - `mongo_uri`
 - `r2_backup_access_key_id`
 - `r2_backup_secret_access_key`
+
+
+## Restore database from backup
+```
+backups mongorestore \
+  --host 167.235.52.168 \
+  --port 2017 \
+  --username <root_user_name> \
+  --password '<pass for root>' \
+  --authenticationDatabase admin \
+  --drop \
+  --gzip \
+  --archive=backup-15-00.gz
+  ```
