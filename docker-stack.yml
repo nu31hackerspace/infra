@@ -135,6 +135,19 @@ services:
       update_config:
         order: start-first
 
+  caddy:
+    image: ghcr.io/vovastelmashchuk/caddy:${GIT_COMMIT_SHA:-latest}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /caddy_storage:/caddy_storage
+    environment:
+      - TZ=UTC
+    deploy:
+      restart_policy:
+        condition: on-failure
+
 secrets:
   mongo_root_username:
     external: true

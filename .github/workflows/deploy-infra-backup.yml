@@ -39,6 +39,32 @@ jobs:
             ${{ env.REGISTRY }}/vovastelmashchuk/mongo-backup:latest
             ${{ env.REGISTRY }}/vovastelmashchuk/mongo-backup:${{ github.sha }}
 
+  build-and-push-caddy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backup
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/vovastelmashchuk/caddy:latest
+            ${{ env.REGISTRY }}/vovastelmashchuk/caddy:${{ github.sha }}
   deploy:
     runs-on: ubuntu-latest
     needs:

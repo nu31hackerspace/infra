@@ -1,0 +1,55 @@
+{
+        email vovochkastelmashchuk@gmail.com
+        storage file_system {
+                root /caddy_storage/
+        }
+}
+
+mixdrinks.org {
+        reverse_proxy * 0.0.0.0:40001
+}
+
+www.mixdrinks.org {
+        redir https://mixdrinks.org{uri}
+}
+
+ypod.stelmashchuk.dev {
+        reverse_proxy * 0.0.0.0:6002
+}
+
+http://ypod.stelmashchuk.dev {
+        reverse_proxy * 0.0.0.0:6002
+}
+
+hardandsoft.stelmashchuk.dev {
+        rewrite /files/rss.xml /api/podcast/android-story/rss.xml
+        rewrite /rss.xml /api/podcast/android-story/rss.xml
+
+        reverse_proxy * 0.0.0.0:6002 {
+                header_up Host "hardandsoft.stelmashchuk.dev"
+                header_up X-Real-IP {remote_host}
+        }
+}
+
+podcast.stelmashchuk.dev {
+        reverse_proxy * 0.0.0.0:6002 {
+                header_up Host "podcast.stelmashchuk.dev"
+                header_up X-Real-IP {remote_host}
+        }
+}
+
+nest2d.stelmashchuk.dev {
+        reverse_proxy * 0.0.0.0:7100
+}
+
+kickstart.stelmashchuk.dev {
+        reverse_proxy * 0.0.0.0:10001
+}
+
+nest2d.online {
+        redir https://nest2d.stelmashchuk.dev
+}
+
+express.stelmashchuk.dev {
+        reverse_proxy * 0.0.0.0:8081
+}
