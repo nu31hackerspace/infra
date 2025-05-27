@@ -147,6 +147,8 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
+    networks:
+      - reverse-proxy
 
 secrets:
   mongo_root_username:
@@ -162,4 +164,8 @@ secrets:
   mongo_express_basic_user:
     external: true
   mongo_express_basic_pass:
+    external: true
+
+networks:
+  reverse-proxy:
     external: true
