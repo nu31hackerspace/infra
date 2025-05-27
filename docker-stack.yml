@@ -168,4 +168,5 @@ secrets:
 
 networks:
   reverse-proxy:
-    external: true
+    driver: overlay
+    attachable: true
