@@ -19,7 +19,7 @@ services:
       mode: global
       labels:
         - "swarm.cronjob.enable=true"
-        - "swarm.cronjob.schedule=0 2,15 * * *"
+        - "swarm.cronjob.schedule=0 2 * * *"
         - "swarm.cronjob.skip-running=false"
       restart_policy:
         condition: none
@@ -145,6 +145,8 @@ services:
     environment:
       - TZ=UTC
     deploy:
+      update_config:
+        order: start-first
       restart_policy:
         condition: on-failure
     networks:
