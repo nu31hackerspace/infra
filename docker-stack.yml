@@ -42,7 +42,7 @@ services:
         order: start-first
       restart_policy:
         condition: on-failure
-        delay: 10s
+        delay: 60s
         max_attempts: 3
         window: 60s
 
