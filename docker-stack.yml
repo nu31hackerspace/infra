@@ -1,6 +1,21 @@
 version: "3.8"
 
 services:
+  dozzle:
+    image: amir20/dozzle:latest
+    environment:
+      - DOZZLE_LEVEL=debug
+      - DOZZLE_MODE=swarm
+      - DOZZLE_AUTH_PROVIDER=simple
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - dozzle
+    deploy:
+      mode: global
+    secrets:
+      - dozzle_users
+
   cron:
     image: crazymax/swarm-cronjob:1.14.0
     volumes:
@@ -9,7 +24,6 @@ services:
       - TZ=UTC
     deploy:
       mode: global
-  
   prune-nodes:
     image: docker:27.4.1
     volumes:
@@ -167,8 +181,12 @@ secrets:
     external: true
   mongo_express_basic_pass:
     external: true
+  dozzle_users:
+    external: true
 
 networks:
   reverse-proxy:
     driver: overlay
     attachable: true
+  dozzle:
+    driver: overlay

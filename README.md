@@ -48,3 +48,9 @@ backups mongorestore \
   --gzip \
   --archive=backup-15-00.gz
   ```
+
+## Local mongo, restore from any backup file
+
+```
+mongorestore --uri="mongodb://0.0.0.0:27017/" --drop --gzip --db=mixdrinks --archive=hourly_mongodump-2025-05-29_13-00.gz
+```
