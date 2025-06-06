@@ -14,7 +14,8 @@ services:
     deploy:
       mode: global
     secrets:
-      - dozzle_users
+      - source: dozzle_users
+        target: /data/users.yml
 
   cron:
     image: crazymax/swarm-cronjob:1.14.0
