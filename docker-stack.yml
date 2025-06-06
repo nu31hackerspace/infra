@@ -5,8 +5,12 @@ services:
     image: amir20/dozzle:latest
     environment:
       - DOZZLE_MODE=swarm
+      - DOZZLE_AUTH_PROVIDER=simple
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    secrets:
+      - source: dozzle_users
+        target: /data/users.yml
     networks:
       - dozzle
       - reverse-proxy
@@ -21,11 +25,13 @@ services:
       - TZ=UTC
     deploy:
       mode: global
+
   prune-nodes:
     image: docker:27.4.1
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
-    command: ["docker", "system", "prune", "--all", "--force", "--filter", "until=24h"]
+    command:
+      ["docker", "system", "prune", "--all", "--force", "--filter", "until=24h"]
     deploy:
       mode: global
       labels:
@@ -79,7 +85,7 @@ services:
       replicas: 0
       restart_policy:
         condition: none
-  
+
   mongo-backup-daily:
     image: ghcr.io/vovastelmashchuk/mongo-backup:${GIT_COMMIT_SHA:-latest}
     command: ["/usr/local/bin/backup.sh"]
@@ -181,12 +187,12 @@ secrets:
   r2_backup_access_key_id:
     external: true
   r2_backup_secret_access_key:
-    external: true 
+    external: true
   mongo_express_basic_user:
     external: true
   mongo_express_basic_pass:
     external: true
-  infra_pass:
+  dozzle_users:
     external: true
 
 networks:
