@@ -177,10 +177,10 @@ secrets:
     external: true
   mongo_express_basic_pass:
     external: true
-  dozzle_users:
-    external: true
 
 networks:
   reverse-proxy:
     driver: overlay
     attachable: true
+  dozzle:
+    driver: overlay
