@@ -55,5 +55,8 @@ express.stelmashchuk.dev {
 }
 
 dozzle.stelmashchuk.dev {
+        basicauth * { 
+                admin {$AUTH_HASH_FILE} 
+        }
         reverse_proxy * infra_dozzle:8080
 }

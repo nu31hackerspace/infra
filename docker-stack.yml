@@ -155,6 +155,10 @@ services:
       - /caddy_storage:/caddy_storage
     environment:
       - TZ=UTC
+      - AUTH_USER=admin
+      - AUTH_HASH_FILE=/run/secrets/infra_pass
+    secrets:
+      - infra_pass
     deploy:
       update_config:
         order: start-first
@@ -177,6 +181,8 @@ secrets:
   mongo_express_basic_user:
     external: true
   mongo_express_basic_pass:
+    external: true
+  infra_pass:
     external: true
 
 networks:
