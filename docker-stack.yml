@@ -174,7 +174,7 @@ services:
       - reverse-proxy
 
   caddy-backup-daily:
-    build: ./caddy-backup
+    image: ghcr.io/vovastelmashchuk/caddy-backup:${GIT_COMMIT_SHA:-latest}
     command: ["/usr/local/bin/backup.sh"]
     depends_on:
       - cron
