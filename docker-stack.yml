@@ -196,6 +196,12 @@ services:
       replicas: 0
       restart_policy:
         condition: none
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "30"
+        max-age: "3d"
 
 secrets:
   mongo_root_username:
