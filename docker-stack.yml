@@ -132,26 +132,6 @@ services:
       restart_policy:
         condition: none
 
-  mongo-express:
-    image: vovochkastelmashchuk/mongo-express:latest
-    depends_on:
-      - mongodb
-    ports:
-      - "8081:8081"
-    environment:
-      - ME_CONFIG_MONGODB_URL_FILE=/run/secrets/mongo_uri
-      - ME_CONFIG_BASICAUTH_ENABLED=true
-      - ME_CONFIG_BASICAUTH_USERNAME_FILE=/run/secrets/mongo_express_basic_user
-      - ME_CONFIG_BASICAUTH_PASSWORD_FILE=/run/secrets/mongo_express_basic_pass
-      - ME_CONFIG_SITE_GRIDFS_ENABLED=true
-    secrets:
-      - mongo_uri
-      - mongo_express_basic_pass
-      - mongo_express_basic_user
-    deploy:
-      update_config:
-        order: start-first
-
   caddy:
     image: ghcr.io/vovastelmashchuk/caddy:${GIT_COMMIT_SHA:-latest}
     dns:
