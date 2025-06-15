@@ -41,6 +41,29 @@ services:
       restart_policy:
         condition: none
 
+  mongodb-stage:
+    image: mongo:7.0.6
+    ports:
+      - "27027:27017"
+    volumes:
+      - /opt/mongodb-data-stage:/data/db
+    secrets:
+      - mongo_root_username_stage
+      - mongo_root_password_stage
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME_FILE=/run/secrets/mongo_root_username_stage
+      - MONGO_INITDB_ROOT_PASSWORD_FILE=/run/secrets/mongo_root_password_stage
+    networks:
+      - mongo-stage
+    deploy:
+      update_config:
+        order: start-first
+      restart_policy:
+        condition: on-failure
+        delay: 60s
+        max_attempts: 3
+        window: 60s
+  
   mongodb:
     image: mongo:7.0.6
     ports:
@@ -161,50 +184,20 @@ services:
     networks:
       - reverse-proxy
 
-  caddy-backup-daily:
-    image: ghcr.io/vovastelmashchuk/caddy-backup:${GIT_COMMIT_SHA:-latest}
-    command: ["/usr/local/bin/backup.sh"]
-    depends_on:
-      - cron
-      - caddy
-    environment:
-      - R2_ACCOUNT_ID=e4b7665fe955c028355a0e2f9e847b98
-      - R2_BUCKET=mongobackup
-      - BACKUP_FOLDER=caddy-backup-daily
-    secrets:
-      - r2_backup_access_key_id
-      - r2_backup_secret_access_key
-    volumes:
-      - /caddy_storage:/caddy_storage:ro
-    deploy:
-      labels:
-        - "swarm.cronjob.enable=true"
-        - "swarm.cronjob.schedule=45 3 * * *"
-        - "swarm.cronjob.skip-running=true"
-      replicas: 0
-      restart_policy:
-        condition: none
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "30"
-        max-age: "3d"
-
 secrets:
   mongo_root_username:
     external: true
   mongo_root_password:
+    external: true
+  mongo_root_username_stage:
+    external: true
+  mongo_root_password_stage:
     external: true
   mongo_uri:
     external: true
   r2_backup_access_key_id:
     external: true
   r2_backup_secret_access_key:
-    external: true
-  mongo_express_basic_user:
-    external: true
-  mongo_express_basic_pass:
     external: true
   dozzle_users:
     external: true
