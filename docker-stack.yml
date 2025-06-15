@@ -54,6 +54,8 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME_FILE=/run/secrets/mongo_root_username
       - MONGO_INITDB_ROOT_PASSWORD_FILE=/run/secrets/mongo_root_password
+    networks:
+      - mongo
     deploy:
       update_config:
         order: start-first
@@ -77,6 +79,8 @@ services:
       - mongo_uri
       - r2_backup_access_key_id
       - r2_backup_secret_access_key
+    networks:
+      - mongo
     deploy:
       labels:
         - "swarm.cronjob.enable=true"
@@ -100,6 +104,8 @@ services:
       - mongo_uri
       - r2_backup_access_key_id
       - r2_backup_secret_access_key
+    networks:
+      - mongo
     deploy:
       labels:
         - "swarm.cronjob.enable=true"
@@ -123,6 +129,8 @@ services:
       - mongo_uri
       - r2_backup_access_key_id
       - r2_backup_secret_access_key
+    networks:
+      - mongo
     deploy:
       labels:
         - "swarm.cronjob.enable=true"
@@ -203,6 +211,9 @@ secrets:
 
 networks:
   reverse-proxy:
+    driver: overlay
+    attachable: true
+  mongo:
     driver: overlay
     attachable: true
   dozzle:
