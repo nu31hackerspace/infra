@@ -209,5 +209,8 @@ networks:
   mongo:
     driver: overlay
     attachable: true
+  mongo-stage:
+    driver: overlay
+    attachable: true
   dozzle:
     driver: overlay
