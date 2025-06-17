@@ -14,7 +14,9 @@ www.mixdrinks.org {
 }
 
 ypod.stelmashchuk.dev {
-        reverse_proxy * ypod_app:3000
+        reverse_proxy * ypod_app:3000 {
+                header_up X-Real-IP {remote_host}
+        }
 }
 
 http://ypod.stelmashchuk.dev {
@@ -43,7 +45,9 @@ nest2d.stelmashchuk.dev {
 }
 
 kickstart.stelmashchuk.dev {
-        reverse_proxy * kickstart_app:3000
+        reverse_proxy * kickstart_app:3000 {
+                header_up X-Real-IP {remote_host}
+        }
 }
 
 nest2d.online {
@@ -59,5 +63,7 @@ dozzle.stelmashchuk.dev {
 }
 
 shop.stelmashchuk.dev {
-        reverse_proxy * shop_app:3000
+        reverse_proxy * shop_app:3000 {
+                header_up X-Real-IP {remote_host}
+        }
 }
