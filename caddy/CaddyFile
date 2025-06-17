@@ -57,3 +57,7 @@ express.stelmashchuk.dev {
 dozzle.stelmashchuk.dev {
         reverse_proxy * infra_dozzle:8080
 }
+
+shop.stelmashchuk.dev {
+        reverse_proxy * shop_app:3000
+}
