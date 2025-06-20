@@ -21,6 +21,9 @@ mongodump \
 UPLOAD_PATH="s3://${S3_BUCKET}/${S3_FOLDER}/mongodump-${TS}.gz"
 echo "[+] Uploading to S3: ${UPLOAD_PATH}"
 
-AWS_ACCESS_KEY_ID="$S3_ACCESS_KEY_ID" AWS_SECRET_ACCESS_KEY="$S3_SECRET_ACCESS_KEY" aws --endpoint-url="$S3_ENDPOINT" s3 cp "$ARCHIVE" "$UPLOAD_PATH"
+export AWS_ACCESS_KEY_ID="$S3_ACCESS_KEY_ID"
+export AWS_SECRET_ACCESS_KEY="$S3_SECRET_ACCESS_KEY"
+
+aws --endpoint-url="$S3_ENDPOINT" s3 cp "$ARCHIVE" "$UPLOAD_PATH"
 
 echo "[+] Done." 
