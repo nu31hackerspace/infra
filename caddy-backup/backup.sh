@@ -21,7 +21,8 @@ echo "[+] Uploading to S3: ${UPLOAD_PATH}"
 
 export AWS_ACCESS_KEY_ID="$S3_ACCESS_KEY_ID"
 export AWS_SECRET_ACCESS_KEY="$S3_SECRET_ACCESS_KEY"
+export AWS_DEFAULT_REGION="auto"
 
-aws --endpoint-url="$S3_ENDPOINT" s3 cp "$ARCHIVE" "$UPLOAD_PATH"
+aws s3 cp "$ARCHIVE" "$UPLOAD_PATH" --endpoint-url="$S3_ENDPOINT" --region="${AWS_DEFAULT_REGION}" --debug
 
 echo "[+] Done."
