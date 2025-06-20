@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Ensure these variables are set
+# Required environment variables:
 : "${MONGO_URI:?need to set MONGO_URI}"
 : "${S3_BUCKET:?need to set S3_BUCKET}"
 : "${S3_ACCESS_KEY_ID:?need to set S3_ACCESS_KEY_ID}"
