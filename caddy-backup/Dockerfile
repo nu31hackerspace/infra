@@ -1,7 +1,6 @@
-FROM alpine:3.19
+FROM amazon/aws-cli:2.27.40
 
-RUN apk -Uuv add busybox-suid less aws-cli curl && \
-	rm /var/cache/apk/*
+RUN yum install -y tar gzip
 
 COPY backup.sh /usr/local/bin/backup.sh
 RUN chmod +x /usr/local/bin/backup.sh
