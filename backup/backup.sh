@@ -14,6 +14,7 @@ set -euo pipefail
 : "${S3_ACCESS_KEY_ID:?need to set S3_ACCESS_KEY_ID}"
 : "${S3_SECRET_ACCESS_KEY:?need to set S3_SECRET_ACCESS_KEY}"
 : "${S3_FOLDER:?need to set S3_FOLDER}"
+: "${S3_ENDPOINT:?need to set S3_ENDPOINT}"
 
 TS="$(date +'%Y-%m-%d_%H-%M')"
 ARCHIVE="/tmp/mongodump-${TS}.gz"
@@ -27,10 +28,9 @@ mongodump \
 UPLOAD_PATH="s3://${S3_BUCKET}/${S3_FOLDER}/mongodump-${TS}.gz"
 echo "[+] Uploading to S3: ${UPLOAD_PATH}"
 
-if [ -n "${S3_ENDPOINT:-}" ]; then
-  aws --endpoint-url="$S3_ENDPOINT" s3 cp "$ARCHIVE" "$UPLOAD_PATH"
-else
-  aws s3 cp "$ARCHIVE" "$UPLOAD_PATH"
-fi
+aws --endpoint-url="$S3_ENDPOINT" \
+  --access-key-id="$S3_ACCESS_KEY_ID" \
+  --secret-access-key="$S3_SECRET_ACCESS_KEY" \
+  s3 cp "$ARCHIVE" "$UPLOAD_PATH"
 
 echo "[+] Done." 

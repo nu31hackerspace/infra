@@ -95,13 +95,12 @@ services:
       - cron
       - mongodb
     environment:
+      - S3_ENDPOINT=https://e4b7665fe955c028355a0e2f9e847b98.r2.cloudflarestorage.com/mongobackup
       - MONGO_URI=${MONGO_URI}
       - S3_BUCKET=mongobackup
       - S3_ACCESS_KEY_ID=e77ffa5f293975926a41535bf32e1ca9
       - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
       - S3_FOLDER=mongo-hourly
-    secrets:
-      - mongo_uri
     networks:
       - mongo
     deploy:
@@ -109,7 +108,7 @@ services:
       replicas: 0
       labels:
         - "swarm.cronjob.enable=true"
-        - "swarm.cronjob.schedule=44 * * * *"
+        - "swarm.cronjob.schedule=0 * * * *"
         - "swarm.cronjob.skip-running=true"
       restart_policy:
         condition: none
@@ -191,12 +190,6 @@ secrets:
   mongo_root_username_stage:
     external: true
   mongo_root_password_stage:
-    external: true
-  mongo_uri:
-    external: true
-  r2_backup_access_key_id:
-    external: true
-  r2_backup_secret_access_key:
     external: true
   dozzle_users:
     external: true
