@@ -1,26 +1,5 @@
 version: "3.8"
 
-x-mongo-backup-base: &mongo-backup-base
-  image: ghcr.io/vovastelmashchuk/mongo-backup:${GIT_COMMIT_SHA:-latest}
-  command: ["/usr/local/bin/backup.sh"]
-  depends_on:
-    - cron
-    - mongodb
-  environment:
-    - R2_ACCOUNT_ID=e4b7665fe955c028355a0e2f9e847b98
-    - R2_BUCKET=mongobackup
-  secrets:
-    - mongo_uri
-    - r2_backup_access_key_id
-    - r2_backup_secret_access_key
-  networks:
-    - mongo
-  deploy:
-    mode: replicated
-    replicas: 0
-    restart_policy:
-      condition: none
-
 services:
   dozzle:
     image: amir20/dozzle:latest
@@ -84,7 +63,7 @@ services:
         delay: 60s
         max_attempts: 3
         window: 60s
-  
+
   mongodb:
     image: mongo:7.0.6
     ports:
@@ -110,31 +89,78 @@ services:
         window: 60s
 
   mongo-backup-hourly:
-    <<: *mongo-backup-base
+    image: ghcr.io/vovastelmashchuk/mongo-backup:${GIT_COMMIT_SHA:-latest}
+    command: ["/usr/local/bin/backup.sh"]
+    depends_on:
+      - cron
+      - mongodb
     environment:
-      - BACKUP_FOLDER=hourly
+      - MONGO_URI=${MONGO_URI}
+      - S3_BUCKET=mongobackup
+      - S3_ACCESS_KEY_ID=e77ffa5f293975926a41535bf32e1ca9
+      - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
+      - S3_FOLDER=mongo-hourly
+    secrets:
+      - mongo_uri
+    networks:
+      - mongo
     deploy:
-      <<: *mongo-backup-base.deploy
+      mode: replicated
+      replicas: 0
       labels:
+        - "swarm.cronjob.enable=true"
         - "swarm.cronjob.schedule=0 * * * *"
+        - "swarm.cronjob.skip-running=true"
+      restart_policy:
+        condition: none
 
   mongo-backup-daily:
-    <<: *mongo-backup-base
+    image: ghcr.io/vovastelmashchuk/mongo-backup:${GIT_COMMIT_SHA:-latest}
+    command: ["/usr/local/bin/backup.sh"]
+    depends_on:
+      - cron
+      - mongodb
     environment:
-      - BACKUP_FOLDER=daily
+      - MONGO_URI=${MONGO_URI}
+      - S3_BUCKET=mongobackup
+      - S3_ACCESS_KEY_ID=e77ffa5f293975926a41535bf32e1ca9
+      - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
+      - S3_FOLDER=mongo-daily
+    networks:
+      - mongo
     deploy:
-      <<: *mongo-backup-base.deploy
+      mode: replicated
+      replicas: 0
       labels:
+        - "swarm.cronjob.enable=true"
         - "swarm.cronjob.schedule=30 3 * * *"
+        - "swarm.cronjob.skip-running=true"
+      restart_policy:
+        condition: none
 
   mongo-backup-weekly:
-    <<: *mongo-backup-base
+    image: ghcr.io/vovastelmashchuk/mongo-backup:${GIT_COMMIT_SHA:-latest}
+    command: ["/usr/local/bin/backup.sh"]
+    depends_on:
+      - cron
+      - mongodb
     environment:
-      - BACKUP_FOLDER=weekly
+      - MONGO_URI=${MONGO_URI}
+      - S3_BUCKET=mongobackup
+      - S3_ACCESS_KEY_ID=e77ffa5f293975926a41535bf32e1ca9
+      - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
+      - S3_FOLDER=mongo-weekly
+    networks:
+      - mongo
     deploy:
-      <<: *mongo-backup-base.deploy
+      mode: replicated
+      replicas: 0
       labels:
-        - "swarm.cronjob.schedule=26 18 * * *"
+        - "swarm.cronjob.enable=true"
+        - "swarm.cronjob.schedule=20 3 * * 2"
+        - "swarm.cronjob.skip-running=true"
+      restart_policy:
+        condition: none
 
   caddy:
     image: ghcr.io/vovastelmashchuk/caddy:${GIT_COMMIT_SHA:-latest}
