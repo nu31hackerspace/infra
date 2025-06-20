@@ -15,6 +15,9 @@ ARCHIVE="/tmp/caddy-backup-${TS}.tar.gz"
 echo "[+] Archiving Caddy data from ${CADDY_DATA_DIR} → ${ARCHIVE}"
 tar -czf "${ARCHIVE}" -C "$(dirname "${CADDY_DATA_DIR}")" "$(basename "${CADDY_DATA_DIR}")"
 
+
+
+
 UPLOAD_PATH="s3://${S3_BUCKET}/${S3_FOLDER}/caddy-backup-${TS}.tar.gz"
 echo "[+] Uploading to S3: ${UPLOAD_PATH}"
 
