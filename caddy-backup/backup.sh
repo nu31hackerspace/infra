@@ -12,7 +12,8 @@ set -euo pipefail
 TS="$(date +'%Y-%m-%d_%H-%M')"
 ARCHIVE="/tmp/caddy-backup-${TS}.tar.gz"
 
-echo "[+] Archiving Caddy data from ${CADDY_DATA_DIR} → ${ARCHIVE}"
+echo "[+] Archiving Caddy data from ${CADDY_DATA_DIR} � ${ARCHIVE}"
+
 ls -la "${CADDY_DATA_DIR}"
 tar -czf "${ARCHIVE}" -C "$(dirname "${CADDY_DATA_DIR}")" "$(basename "${CADDY_DATA_DIR}")"
 
