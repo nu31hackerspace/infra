@@ -7,6 +7,7 @@ services:
       - DOZZLE_MODE=swarm
       - DOZZLE_AUTH_PROVIDER=simple
       - DOZZLE_ENABLE_ACTIONS=true
+      - DOZZLE_ENABLE_SHELL=true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     secrets:
@@ -165,22 +166,18 @@ services:
         condition: none
 
   caddy-backup-daily:
-    image: ghcr.io/vovastelmashchuk/caddy-backup:${GIT_COMMIT_SHA:-latest}
-    command: ["/usr/local/bin/backup.sh"]
+    image: dokku/s3backup
     depends_on:
       - cron
       - caddy
-    networks:
-      - caddy-backup
     environment:
-      - S3_ENDPOINT=https://e4b7665fe955c028355a0e2f9e847b98.r2.cloudflarestorage.com
-      - S3_BUCKET=backups
-      - S3_ACCESS_KEY_ID=e77ffa5f293975926a41535bf32e1ca9
-      - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
-      - S3_FOLDER=caddy-daily
-      - CADDY_DATA_DIR=/caddy_storage
+      - ENDPOINT_URL=https://e4b7665fe955c028355a0e2f9e847b98.r2.cloudflarestorage.com
+      - AWS_ACCESS_KEY_ID=e77ffa5f293975926a41535bf32e1ca9
+      - AWS_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
+      - BUCKET_NAME=backups
+      - BACKUP_NAME=caddy-daily
     volumes:
-      - /caddy_storage:/caddy_storage
+      - /caddy_storage:/backup:ro
     deploy:
       mode: replicated
       replicas: 0
