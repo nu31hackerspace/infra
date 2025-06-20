@@ -12,6 +12,32 @@ env:
   HOST: 167.235.52.168
 
 jobs:
+  build-and-push-caddy-backup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./caddy-backup
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/vovastelmashchuk/caddy-backup:latest
+            ${{ env.REGISTRY }}/vovastelmashchuk/caddy-backup:${{ github.sha }}
+
   build-and-push-mongo-backup:
     runs-on: ubuntu-latest
     permissions:
@@ -69,6 +95,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - build-and-push-mongo-backup
+      - build-and-push-caddy-backup
       - build-and-push-caddy
     steps:
       - name: Checkout repository
