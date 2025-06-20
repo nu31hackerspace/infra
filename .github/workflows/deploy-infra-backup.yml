@@ -77,6 +77,8 @@ jobs:
       - name: Create env file
         run: |
             echo "GIT_COMMIT_SHA=${{ github.sha }}" >> ./envfile
+            echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> ./envfile
+            echo "S3_SECRET_ACCESS_KEY=${{ secrets.S3_SECRET_ACCESS_KEY }}" >> ./envfile
 
       - name: Docker Stack Deploy
         uses: cssnr/stack-deploy-action@v1
