@@ -237,3 +237,4 @@ networks:
     driver: overlay
   caddy-backup:
     driver: overlay
+    attachable: true
