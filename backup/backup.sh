@@ -1,14 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Ensure these are set in your `docker run` env:
-# - MONGO_URI            e.g. mongodb://user:pass@host:27017/db
-# - S3_BUCKET            your S3 bucket name
-# - S3_ACCESS_KEY_ID     S3 access key
-# - S3_SECRET_ACCESS_KEY S3 secret key
-# - S3_FOLDER            backup folder path in the bucket
-# - S3_ENDPOINT          (optional) custom S3 endpoint URL (e.g. for R2, MinIO, etc.)
-
+# Ensure these variables are set
 : "${MONGO_URI:?need to set MONGO_URI}"
 : "${S3_BUCKET:?need to set S3_BUCKET}"
 : "${S3_ACCESS_KEY_ID:?need to set S3_ACCESS_KEY_ID}"
