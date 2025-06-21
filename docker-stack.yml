@@ -176,7 +176,7 @@ services:
       - S3_TARGET=s3://backups/caddy-daily
       - AWS_ACCESS_KEY_ID=e77ffa5f293975926a41535bf32e1ca9
       - AWS_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
-      - AWS_ENDPOINT_URL=https://e4b7665fe955c028355a0e2f9e847b98.r2.cloudflarestorage.com
+      - AWS_ENDPOINT_URL=https://e4b7665fe955c028355a0e2f9e847b98.r2.cloudflarestorage.com/backups
     volumes:
       - /caddy_storage:/home/backupuser/data
     deploy:
