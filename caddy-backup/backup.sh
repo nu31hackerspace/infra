@@ -25,4 +25,4 @@ export AWS_SECRET_ACCESS_KEY="$S3_SECRET_ACCESS_KEY"
 
 aws --endpoint-url="$S3_ENDPOINT" s3 cp "$ARCHIVE" "$UPLOAD_PATH"
 
-echo "[+] Done." 
+echo "[+] Done."
