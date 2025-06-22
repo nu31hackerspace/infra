@@ -235,6 +235,3 @@ networks:
     attachable: true
   dozzle:
     driver: overlay
-  caddy-backup:
-    driver: overlay
-    attachable: true
