@@ -179,7 +179,7 @@ services:
       - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
       - S3_FOLDER=mongo-weekly
     volumes:
-      - /caddy_storage:/home/backupuser/data
+      - /caddy_storage:/caddy_storage
     deploy:
       mode: replicated
       replicas: 0
