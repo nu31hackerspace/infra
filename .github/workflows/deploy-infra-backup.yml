@@ -12,7 +12,20 @@ env:
   HOST: 167.235.52.168
 
 jobs:
-  build-and-push-mongo-backup:
+  build-and-push:
+    strategy:
+      matrix:
+        include:
+          - name: mongo-backup
+            context: ./mongo-backup
+            image: mongo-backup
+          - name: caddy
+            context: ./caddy
+            image: caddy
+          - name: caddy-backup
+            context: ./caddy-backup
+            image: caddy-backup
+    
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -33,43 +46,15 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
-          context: ./backup
+          context: ${{ matrix.context }}
           push: true
           tags: |
-            ${{ env.REGISTRY }}/vovastelmashchuk/mongo-backup:latest
-            ${{ env.REGISTRY }}/vovastelmashchuk/mongo-backup:${{ github.sha }}
+            ${{ env.REGISTRY }}/vovastelmashchuk/${{ matrix.image }}:latest
+            ${{ env.REGISTRY }}/vovastelmashchuk/${{ matrix.image }}:${{ github.sha }}
 
-  build-and-push-caddy:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Log in to the Container registry
-        uses: docker/login-action@v2
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: ./caddy
-          push: true
-          tags: |
-            ${{ env.REGISTRY }}/vovastelmashchuk/caddy:latest
-            ${{ env.REGISTRY }}/vovastelmashchuk/caddy:${{ github.sha }}
   deploy:
     runs-on: ubuntu-latest
-    needs:
-      - build-and-push-mongo-backup
-      - build-and-push-caddy
+    needs: build-and-push
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
