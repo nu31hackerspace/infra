@@ -166,7 +166,7 @@ services:
         condition: none
 
   caddy-backup-daily:
-    image: ultrasites/data-backup-s3
+    image: ghcr.io/vovastelmashchuk/caddy-backup:${GIT_COMMIT_SHA:-latest}
     depends_on:
       - cron
       - caddy
