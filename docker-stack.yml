@@ -29,11 +29,10 @@ services:
       mode: global
 
   prune-nodes:
-    image: docker:27.4.1
+    image: docker:27.3.1-cli
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
-    command:
-      ["docker", "system", "prune", "--all", "--force", "--filter", "until=24h"]
+    command: ["docker", "system", "prune", "--all", "--force"]
     deploy:
       mode: global
       labels:
