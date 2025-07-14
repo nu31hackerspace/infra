@@ -90,7 +90,7 @@ services:
         window: 60s
 
   mongo-express:
-    image: mongo-express:latest
+    image: mongo-express:1.1.0
     environment:
       - ME_CONFIG_MONGODB_URL=${MONGO_URI}
       - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
