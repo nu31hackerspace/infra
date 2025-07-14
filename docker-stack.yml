@@ -89,6 +89,21 @@ services:
         max_attempts: 3
         window: 60s
 
+  mongo-express:
+    image: mongo-express:latest
+    environment:
+      - ME_CONFIG_MONGODB_URL=${MONGO_URI}
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=false
+      - ME_CONFIG_BASICAUTH_ENABLED=true
+      - ME_CONFIG_BASICAUTH_USERNAME=${MONGO_EXPRESS_USERNAME}
+      - ME_CONFIG_BASICAUTH_PASSWORD=${MONGO_EXPRESS_PASSWORD}
+    networks:
+      - mongo
+      - reverse-proxy
+    deploy:
+      mode: replicated
+      replicas: 0
+
   mongo-backup-hourly:
     image: ghcr.io/vovastelmashchuk/mongo-backup:${GIT_COMMIT_SHA:-latest}
     command: ["/usr/local/bin/backup.sh"]
