@@ -101,8 +101,13 @@ services:
       - mongo
       - reverse-proxy
     deploy:
-      mode: replicated
-      replicas: 0
+      update_config:
+        order: start-first
+      restart_policy:
+        condition: on-failure
+        delay: 60s
+        max_attempts: 3
+        window: 60s
 
   mongo-backup-hourly:
     image: ghcr.io/vovastelmashchuk/mongo-backup:${GIT_COMMIT_SHA:-latest}
