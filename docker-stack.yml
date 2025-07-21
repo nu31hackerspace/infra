@@ -90,14 +90,11 @@ services:
         window: 60s
 
   mongo-express:
-    image: mongo-express:latest
+    image: haohanyang/compass-web:0.2.3
     environment:
-      - ME_CONFIG_MONGODB_URL=${MONGO_URI}
-      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
-      - ME_CONFIG_BASICAUTH_ENABLED=true
-      - ME_CONFIG_BASICAUTH_USERNAME=${MONGO_EXPRESS_USERNAME}
-      - ME_CONFIG_BASICAUTH_PASSWORD=${MONGO_EXPRESS_PASSWORD}
-      - ME_CONFIG_SITE_GRIDFS_ENABLED=false # Turn off GridFS for now, it's not working, the open fs produce the crash of the mongo-express
+      - CW_MONGO_URI=${MONGO_URI}
+      - CW_BASIC_AUTH_USERNAME=${MONGO_EXPRESS_USERNAME}
+      - CW_BASIC_AUTH_PASSWORD=${MONGO_EXPRESS_PASSWORD}
     networks:
       - mongo
       - reverse-proxy
