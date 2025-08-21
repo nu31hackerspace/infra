@@ -1,42 +1,39 @@
-# infra
-The project with all scripts for setup my infractructure.
+# Infra for pet project
 
-# MongoDB to Cloudflare R2 Backup Docker Image
+We build real **uncloud** here.
 
-This Docker image backs up a MongoDB database and uploads the backup to Cloudflare R2 using the AWS CLI.
+The project with all scripts for setup a infractructure for simple pet project, without over enginiring, but with require attribute,
+such as backups for database, backup for reverse proxy etc.
+
+The project deploy all infracstrucute as docker stack with service as networks. 
+
+# MongoDB to any S3 Backup Docker Image
+
+This Docker image backs up a MongoDB database and uploads the backup to any s3 using the AWS CLI.
 
 ## Usage
 
-1. **Build the Docker image:**
+The project build 3 internal images.
 
-   ```sh
-   docker build -t mongo-r2-backup ./backup
-   ```
+ - caddy - the reverse proxy of choose
+ - caddy-backup - the container for backup the caddy files to s3 bucket
+ - mongo-backup - the container for backup the mongo db directory to s3 bucket
 
-2. **Run the container:**
-Add all secrets localy and run the docker-stack.local.yml
+## Build & deploy
 
-## Required Environment Variables
+For more details, take a look at [project github action](https://github.com/VovaStelmashchuk/infra/tree/main/.github/workflows)
 
-- `MONGO_URI` - MongoDB connection string (e.g., `mongodb://user:pass@host:27017/?authSource=admin`)
-- `R2_ACCOUNT_ID` - Cloudflare Account ID
-- `R2_BUCKET` - Cloudflare R2 bucket name
-- `R2_ACCESS_KEY_ID` - Cloudflare R2 access key
-- `R2_SECRET_ACCESS_KEY` - Cloudflare R2 secret key
+You can find all required envirment variable and secrets for the project into github action job `Create env file`, Also some secret provide as docker secret, but I have been trying to get rid of docker secrets in the project. 
 
-## How it works
+
+## Mongo backup
+
+### How mongo backup works
 
 - Dumps the MongoDB database to a compressed archive
 - Uploads the archive to Cloudflare R2 using the AWS CLI
 
-# Secrets
-
-- `mongo_uri`
-- `r2_backup_access_key_id`
-- `r2_backup_secret_access_key`
-
-
-## Restore database from backup
+### Restore database from backup
 ```
 backups mongorestore \
   --host 167.235.52.168 \
@@ -49,7 +46,7 @@ backups mongorestore \
   --archive=backup-15-00.gz
   ```
 
-## Local mongo, restore from any backup file
+### Local mongo, restore from any backup file
 
 ```
 mongorestore --uri="mongodb://0.0.0.0:27017/" --drop --gzip --db=mixdrinks --archive=hourly_mongodump-2025-05-29_13-00.gz

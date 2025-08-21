@@ -1,6 +1,24 @@
 version: "3.8"
 
 services:
+  beszel:
+    image: henrygd/beszel:latest
+    container_name: beszel
+    restart: unless-stopped
+    ports:
+      - 8090:8090
+    volumes:
+      - ./beszel_data:/beszel_data
+      - ./beszel_socket:/beszel_socket
+    deploy:
+      update_config:
+        order: start-first
+      restart_policy:
+        condition: on-failure
+        delay: 60s
+        max_attempts: 3
+        window: 60s
+
   dozzle:
     image: amir20/dozzle:latest
     environment:
