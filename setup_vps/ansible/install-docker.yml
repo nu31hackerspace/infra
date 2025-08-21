@@ -1,0 +1,161 @@
+---
+- name: Install Docker on Ubuntu
+  vars:
+    ssh_port: "{{ ssh_port }}"
+    deploy_user: "{{ deploy_user }}"
+    deploy_user_public_key: "{{ deploy_user_public_key }}"
+    allowed_ports:
+      - { name: "HTTP on 80", port: "80" }
+      - { name: "HTTP on 8080", port: "8080" }
+      - { name: "HTTPS", port: "443" }
+      - { name: "SSH", port: "{{ ssh_port }}" }
+
+  hosts: all
+  become: yes
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install required packages
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+        state: present
+
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+
+    - name: Update apt cache after adding repository
+      apt:
+        update_cache: yes
+
+    - name: Install Docker CE
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+
+    - name: Start and enable Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Create deploy user
+      user:
+        name: deploy
+        shell: /bin/bash
+        home: /home/deploy
+        create_home: yes
+        state: present
+
+    - name: Add deploy user to docker group
+      user:
+        name: deploy
+        groups: docker
+        append: yes
+
+    - name: Create .ssh directory for deploy user
+      file:
+        path: /home/deploy/.ssh
+        state: directory
+        owner: deploy
+        group: deploy
+        mode: "0700"
+
+    - name: Set up SSH key for deploy user (optional)
+      authorized_key:
+        user: deploy
+        state: present
+        key: "{{ deploy_user_public_key }}"
+
+    - name: Backup SSH configuration
+      copy:
+        src: /etc/ssh/sshd_config
+        dest: /etc/ssh/sshd_config.backup
+        remote_src: yes
+        backup: yes
+
+    - name: Change SSH port
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^#?Port "
+        line: "Port {{ ssh_port }}"
+        state: present
+
+    - name: Ensure SSH service is enabled
+      systemd:
+        name: ssh
+        enabled: yes
+        state: started
+
+    - name: Restart SSH service
+      systemd:
+        name: ssh
+        state: restarted
+
+    - name: Install UFW firewall
+      apt:
+        name: ufw
+        state: present
+
+    - name: Reset UFW to default policy
+      ufw:
+        state: reset
+
+    - name: Set UFW default policies
+      ufw:
+        direction: "{{ item }}"
+        policy: deny
+      loop:
+        - incoming
+
+    - name: Allow outgoing traffic
+      ufw:
+        direction: outgoing
+        policy: allow
+
+    - name: Allow specified ports
+      ufw:
+        rule: allow
+        port: "{{ item.port }}"
+        proto: tcp
+      loop: "{{ allowed_ports }}"
+      loop_control:
+        label: "Allow {{ item.name }} on port {{ item.port }}"
+
+    - name: Enable UFW firewall
+      ufw:
+        state: enabled
+
+    - name: Verify Docker installation
+      command: docker --version
+      register: docker_version
+      changed_when: false
+
+    - name: Display Docker version
+      debug:
+        msg: "Docker version: {{ docker_version.stdout }}"
+
+    - name: Display SSH port change
+      debug:
+        msg: "SSH port changed to {{ ssh_port }}"
+
+    - name: Display firewall status
+      debug:
+        msg: "Firewall enabled with SSH port {{ ssh_port }}, HTTP (80, 8080), and HTTPS (443) allowed"
