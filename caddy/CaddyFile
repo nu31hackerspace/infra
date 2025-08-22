@@ -62,10 +62,6 @@ dozzle.stelmashchuk.dev {
         reverse_proxy * infra_dozzle:8080
 }
 
-beszel.stelmashchuk.dev {
-        reverse_proxy * infra_beszel:8090
-}
-
 shop.stelmashchuk.dev {
         reverse_proxy * shop_app:3000 {
                 header_up X-Real-IP {remote_host}
