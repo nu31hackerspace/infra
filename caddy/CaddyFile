@@ -67,3 +67,7 @@ shop.stelmashchuk.dev {
                 header_up X-Real-IP {remote_host}
         }
 }
+
+nu31.space {
+        reverse_proxy * nu31space_app:3000
+}
