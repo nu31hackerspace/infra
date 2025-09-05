@@ -55,7 +55,7 @@ nest2d.online {
 }
 
 express.stelmashchuk.dev {
-        reverse_proxy * infra_mongo-express:8080
+        reverse_proxy * infra_mongo-viewer:8080
 }
 
 dozzle.stelmashchuk.dev {

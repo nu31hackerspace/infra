@@ -88,6 +88,23 @@ services:
         delay: 60s
         max_attempts: 3
         window: 60s
+  
+  mongo-viewer:
+    image: haohanyang/compass-web
+    environment:
+      - CW_MONGO_URI=${MONGO_URI}
+      - CW_BASIC_AUTH_USERNAME=${MONGO_VIEWER_USER}
+      - CW_BASIC_AUTH_PASSWORD=${MONGO_VIEWER_PASS}
+    networks:
+      - mongo
+    deploy:
+      update_config:
+        order: start-first
+      restart_policy:
+        condition: on-failure
+        delay: 60s
+        max_attempts: 3
+        window: 60s
 
   mongo-backup-hourly:
     image: ghcr.io/vovastelmashchuk/mongo-backup:${GIT_COMMIT_SHA:-latest}

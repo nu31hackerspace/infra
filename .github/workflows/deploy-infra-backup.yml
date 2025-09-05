@@ -63,8 +63,8 @@ jobs:
         run: |
             echo "GIT_COMMIT_SHA=${{ github.sha }}" >> ./envfile
             echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> ./envfile
-            echo "MONGO_EXPRESS_USERNAME=${{ vars.MONGO_EXPRESS_USERNAME }}" >> ./envfile
-            echo "MONGO_EXPRESS_PASSWORD=${{ secrets.MONGO_EXPRESS_PASSWORD }}" >> ./envfile
+            echo "MONGO_VIEWER_USER=${{ vars.MONGO_VIEWER_USER }}" >> ./envfile
+            echo "MONGO_VIEWER_PASS=${{ secrets.MONGO_VIEWER_PASS }}" >> ./envfile
             echo "S3_SECRET_ACCESS_KEY=${{ secrets.S3_SECRET_ACCESS_KEY }}" >> ./envfile
             echo "S3_ACCESS_KEY_ID=${{ vars.S3_ACCESS_KEY_ID }}" >> ./envfile
             echo "S3_ENDPOINT=${{ vars.S3_ENDPOINT }}" >> ./envfile
