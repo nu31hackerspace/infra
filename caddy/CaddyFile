@@ -54,7 +54,7 @@ nest2d.online {
         redir https://nest2d.stelmashchuk.dev
 }
 
-express.stelmashchuk.dev {
+compass.stelmashchuk.dev {
         reverse_proxy * infra_mongo-viewer:8080
 }
 

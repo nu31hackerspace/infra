@@ -14,7 +14,6 @@ services:
       - source: dozzle_users
         target: /data/users.yml
     networks:
-      - dozzle
       - reverse-proxy
     deploy:
       mode: global
@@ -68,6 +67,8 @@ services:
   
   mongo-viewer:
     image: haohanyang/compass-web
+    depends_on:
+      - mongodb
     environment:
       - CW_MONGO_URI=${MONGO_URI}
       - CW_BASIC_AUTH_USERNAME=${MONGO_VIEWER_USER}
@@ -210,10 +211,6 @@ secrets:
     external: true
   mongo_root_password:
     external: true
-  mongo_root_username_stage:
-    external: true
-  mongo_root_password_stage:
-    external: true
   dozzle_users:
     external: true
 
@@ -224,8 +221,3 @@ networks:
   mongo:
     driver: overlay
     attachable: true
-  mongo-stage:
-    driver: overlay
-    attachable: true
-  dozzle:
-    driver: overlay
