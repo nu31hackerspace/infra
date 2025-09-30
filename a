@@ -1,0 +1,48 @@
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# On branch main
+# Your branch is ahead of 'origin/main' by 4 commits.
+#   (use "git push" to publish your local commits)
+#
+# Changes to be committed:
+#	modified:   caddy/CaddyFile
+#
+# ------------------------ >8 ------------------------
+# Do not modify or remove the line above.
+# Everything below it will be ignored.
+diff --git a/caddy/CaddyFile b/caddy/CaddyFile
+index c1afb1b..9f18cf4 100644
+--- a/caddy/CaddyFile
++++ b/caddy/CaddyFile
+@@ -5,6 +5,14 @@
+         }
+ }
+ 
++dozzle.stelmashchuk.dev {
++        reverse_proxy * infra_dozzle:8080
++}
++
++compass.stelmashchuk.dev {
++        reverse_proxy * infra_mongo-viewer:8080
++}
++
+ mixdrinks.org {
+         reverse_proxy * mixdrinks_app:3000
+ }
+@@ -54,14 +62,6 @@ nest2d.online {
+         redir https://nest2d.stelmashchuk.dev
+ }
+ 
+-compass.stelmashchuk.dev {
+-        reverse_proxy * infra_mongo-viewer:8080
+-}
+-
+-dozzle.stelmashchuk.dev {
+-        reverse_proxy * infra_dozzle:8080
+-}
+-
+ shop.stelmashchuk.dev {
+         reverse_proxy * shop_app:3000 {
+                 header_up X-Real-IP {remote_host}
