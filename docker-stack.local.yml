@@ -10,7 +10,8 @@ services:
     networks:
       - mongo
     deploy:
-      mode: global
+      mode: replicated
+      replicas: 1
 
   mongo-viewer:
     image: haohanyang/compass-web

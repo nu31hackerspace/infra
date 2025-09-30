@@ -2,35 +2,87 @@
 
 We build real **uncloud** here.
 
-The project with all scripts for setup a infractructure for simple pet project, without over enginiring, but with require attribute,
+The project with all scripts for setup an infrastructure for simple pet project, without over engineering, but with all required components,
 such as backups for database, backup for reverse proxy etc.
 
-The project deploy all infracstrucute as docker stack with service as networks.
+The project prepares VPS for hosting docker stack by Ansible scripts. All infrastructure components deploy as docker services. Also configuration provides presetup docker networks.
 
-# MongoDB to any S3 Backup Docker Image
+## Infrastructure components
 
-This Docker image backs up a MongoDB database and uploads the backup to any s3 using the AWS CLI.
+### Database
 
-## Usage
+MongoDB is my database of choice. I believe it's the only data store which you need to build the project.
+I use the mongodb bucket for BLOB store, it make local infracture easy to handle, and the API for mongo bucket easy to work compare to S3 buckets.
 
-The project build 3 internal images.
+### Reverse proxy
 
-- caddy - the reverse proxy of choose
-- caddy-backup - the container for backup the caddy files to s3 bucket
-- mongo-backup - the container for backup the mongo db directory to s3 bucket
+The project provides **caddy** as reverse proxy for handle SSL key generation and allow you to host few services on one VPS.
+
+### Periodic tasks
+
+The `infra` stack has the cron executor `crazymax/swarm-cronjob` which is used for periodic backup database and caddy config
+
+### Backups
+
+The project provides periodic backups for mongo and caddy config.
+The Database backups each hour, each day, and each week, all backups can be stored in any S3 compatible storage.
 
 ## Build & deploy
 
 For more details, take a look at [project github action](https://github.com/VovaStelmashchuk/infra/tree/main/.github/workflows)
 
-You can find all required envirment variable and secrets for the project into github action job `Create env file`, Also some secret provide as docker secret, but I have been trying to get rid of docker secrets in the project.
+You can find all required environment variables and secrets for the project in the github action job `Create env file`. Also some secrets are provided as docker secrets, but I have been trying to get rid of docker secrets in the project.
 
-## Mongo backup
+## Local development
 
-### How mongo backup works
+For local infrastructure use file `docker-stack.local.yml` - the file setup only mongo and mongo viewer
 
-- Dumps the MongoDB database to a compressed archive
-- Uploads the archive to Cloudflare R2 using the AWS CLI
+The setup is tested only for MacOS with `colima`
+
+1. Start colima by command
+
+In case `qemu` is not installed on your machine, install it by command `brew install qemu`
+
+```bash
+colima start --network-address
+```
+
+2. Verify colima status
+
+```bash
+colima status
+```
+
+The command will return information about colima virtual machine, look to the line `INFO[0000] address:`
+Use the colima VM IP address to start the docker stack
+
+```bash
+docker swarm init --advertise-addr <IP address from the colima status command>
+```
+
+3. Run docker stack
+
+```bash
+docker stack deploy -c docker-stack.local.yml infra
+```
+
+The command will start the mongodb at port 27017 and mongo viewer on port 5000 into colima VM.
+
+Open http://<colima ip>:5000 to browse the mongo db.
+
+4. (Optional) Apply backup/snapshot of mongodb to your local environment
+
+Copy mongo backup file into docker container
+
+```bash
+docker cp /path/to/backup/test.archive mongo:/test.archive
+```
+
+Restore mongo from backup
+
+```bash
+docker exec -it <mongo container> mongorestore --uri mongodb://localhost:27017 --gzip --archive=test.archive
+```
 
 ### Restore database from backup
 

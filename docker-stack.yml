@@ -42,29 +42,6 @@ services:
       restart_policy:
         condition: none
 
-  mongodb-stage:
-    image: mongo:7.0.6
-    ports:
-      - "27027:27017"
-    volumes:
-      - /opt/mongodb-data-stage:/data/db
-    secrets:
-      - mongo_root_username_stage
-      - mongo_root_password_stage
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME_FILE=/run/secrets/mongo_root_username_stage
-      - MONGO_INITDB_ROOT_PASSWORD_FILE=/run/secrets/mongo_root_password_stage
-    networks:
-      - mongo-stage
-    deploy:
-      update_config:
-        order: start-first
-      restart_policy:
-        condition: on-failure
-        delay: 60s
-        max_attempts: 3
-        window: 60s
-
   mongodb:
     image: mongo:7.0.6
     ports:
@@ -244,9 +221,6 @@ networks:
     driver: overlay
     attachable: true
   mongo:
-    driver: overlay
-    attachable: true
-  mongo-stage:
     driver: overlay
     attachable: true
   dozzle:
