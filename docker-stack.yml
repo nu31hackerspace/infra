@@ -48,12 +48,9 @@ services:
       - "27017:27017"
     volumes:
       - /opt/mongodb-data:/data/db
-    secrets:
-      - mongo_root_username
-      - mongo_root_password
     environment:
-      - MONGO_INITDB_ROOT_USERNAME_FILE=/run/secrets/mongo_root_username
-      - MONGO_INITDB_ROOT_PASSWORD_FILE=/run/secrets/mongo_root_password
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
     networks:
       - mongo
     deploy:
@@ -207,10 +204,6 @@ services:
       - reverse-proxy
 
 secrets:
-  mongo_root_username:
-    external: true
-  mongo_root_password:
-    external: true
   dozzle_users:
     external: true
 
