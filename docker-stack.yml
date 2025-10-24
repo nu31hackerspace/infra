@@ -16,7 +16,13 @@ services:
     networks:
       - reverse-proxy
     deploy:
-      mode: global
+      update_config:
+        order: start-first
+      restart_policy:
+        condition: on-failure
+        delay: 60s
+        max_attempts: 3
+        window: 60s
 
   cron:
     image: crazymax/swarm-cronjob:1.14.0
