@@ -14,6 +14,14 @@ The project prepares VPS for hosting docker stack by Ansible scripts. All infras
 MongoDB is my database of choice. I believe it's the only data store which you need to build the project.
 I use the mongodb bucket for BLOB store, it make local infracture easy to handle, and the API for mongo bucket easy to work compare to S3 buckets.
 
+MongoDB run in replica set with one node, the solution allow to use all mongo replica set feature as watch the collection.
+
+Generate key for replica set (execute on server mathine)
+
+```sh
+openssl rand -base64 756 | docker secret create mongodb-keyfile -
+```
+
 ### Reverse proxy
 
 The project provides **caddy** as reverse proxy for handle SSL key generation and allow you to host few services on one VPS.
