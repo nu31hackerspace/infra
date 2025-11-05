@@ -67,6 +67,92 @@ services:
         max_attempts: 3
         window: 60s
 
+  mongodb-rs:
+    image: mongo:8.2.1
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongodb-rs-data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+    command: >
+      sh -c "
+      cp /etc/mongodb-keyfile /tmp/mongodb-keyfile &&
+      chmod 600 /tmp/mongodb-keyfile &&
+      chown 999:999 /tmp/mongodb-keyfile &&
+      exec mongod --replSet rs0 --bind_ip_all --keyFile /tmp/mongodb-keyfile
+      "
+    secrets:
+      - source: mongodb-keyfile
+        target: /etc/mongodb-keyfile
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    networks:
+      - mongo
+    deploy:
+      update_config:
+        order: start-first
+      restart_policy:
+        condition: on-failure
+        delay: 60s
+        max_attempts: 3
+        window: 60s
+
+  mongodb-rs-init:
+    image: mongo:8.2.1
+    environment:
+      - MONGO_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+      - MONGO_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+    command: >
+      sh -c "
+      echo 'Waiting for MongoDB replica set to be ready...' &&
+      sleep 20 &&
+      echo 'Waiting for MongoDB to accept connections...' &&
+      until mongosh --host mongodb-rs:27017 --eval 'db.adminCommand(\"ping\")' --quiet 2>/dev/null; do
+        echo 'Waiting for MongoDB...';
+        sleep 5;
+      done &&
+      echo 'Waiting for authentication to be ready...' &&
+      sleep 10 &&
+      until mongosh --host mongodb-rs:27017 -u $${MONGO_ROOT_USERNAME} -p $${MONGO_ROOT_PASSWORD} --authenticationDatabase admin --eval 'db.adminCommand(\"ping\")' --quiet 2>/dev/null; do
+        echo 'Waiting for authentication...';
+        sleep 5;
+      done &&
+      echo 'MongoDB is ready, checking replica set status...' &&
+      mongosh --host mongodb-rs:27017 -u $${MONGO_ROOT_USERNAME} -p $${MONGO_ROOT_PASSWORD} --authenticationDatabase admin --quiet --eval '
+        try {
+          var status = rs.status();
+          print(\"Replica set already initialized. Status: \" + status.set);
+        } catch (e) {
+          if (e.message.includes(\"no replset config has been received\")) {
+            print(\"Initializing replica set...\");
+            var result = rs.initiate({
+              _id: \"rs0\",
+              members: [{ _id: 0, host: \"mongodb-rs:27017\" }]
+            });
+            print(\"Replica set initialization initiated successfully\");
+          } else {
+            print(\"Error: \" + e.message);
+            throw e;
+          }
+        }
+      ' || exit 1 &&
+      echo 'Replica set initialization completed'
+      "
+    networks:
+      - mongo
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: none
+      labels:
+        - "swarm.cronjob.enable=false"
+
   mongo-viewer:
     image: haohanyang/compass-web
     depends_on:
@@ -211,6 +297,8 @@ services:
 secrets:
   dozzle_users:
     external: true
+  mongodb-keyfile:
+    external: true
 
 networks:
   reverse-proxy:
@@ -219,3 +307,6 @@ networks:
   mongo:
     driver: overlay
     attachable: true
+
+volumes:
+  mongodb-rs-data:
