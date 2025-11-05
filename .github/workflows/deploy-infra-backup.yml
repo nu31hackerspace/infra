@@ -67,6 +67,7 @@ jobs:
             echo "MONGO_VIEWER_PASS=${{ secrets.MONGO_VIEWER_PASS }}" >> ./envfile
             echo "MONGO_ROOT_USERNAME=${{ vars.MONGO_ROOT_USERNAME }}" >> ./envfile
             echo "MONGO_ROOT_PASSWORD=${{ secrets.MONGO_ROOT_PASSWORD }}" >> ./envfile
+            echo "MONGO_KEYFILE=${{ secrets.MONGO_KEYFILE_CONTENT }}" >> ./envfile
             echo "S3_SECRET_ACCESS_KEY=${{ secrets.S3_SECRET_ACCESS_KEY }}" >> ./envfile
             echo "S3_ACCESS_KEY_ID=${{ vars.S3_ACCESS_KEY_ID }}" >> ./envfile
             echo "S3_ENDPOINT=${{ vars.S3_ENDPOINT }}" >> ./envfile

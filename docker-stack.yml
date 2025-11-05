@@ -74,18 +74,14 @@ services:
     volumes:
       - mongodb-rs-data:/data/db
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+      - MONGO_KEYFILE=${MONGO_KEYFILE}
     command: >
       sh -c "
-      cp /etc/mongodb-keyfile /tmp/mongodb-keyfile &&
+      echo \"$${MONGO_KEYFILE}\" > /tmp/mongodb-keyfile &&
       chmod 600 /tmp/mongodb-keyfile &&
       chown 999:999 /tmp/mongodb-keyfile &&
       exec mongod --replSet rs0 --bind_ip_all --keyFile /tmp/mongodb-keyfile
       "
-    secrets:
-      - source: mongodb-keyfile
-        target: /etc/mongodb-keyfile
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 10s
@@ -117,13 +113,49 @@ services:
         echo 'Waiting for MongoDB...';
         sleep 5;
       done &&
-      echo 'Waiting for authentication to be ready...' &&
-      sleep 10 &&
+      echo 'MongoDB is ready, creating root user if not exists...' &&
+      mongosh --host mongodb-rs:27017 --quiet --eval '
+        try {
+          var users = db.getSiblingDB(\"admin\").getUsers();
+          var userExists = users.some(function(u) { return u.user == \"$${MONGO_ROOT_USERNAME}\"; });
+          if (!userExists) {
+            print(\"Creating root user...\");
+            db.getSiblingDB(\"admin\").createUser({
+              user: \"$${MONGO_ROOT_USERNAME}\",
+              pwd: \"$${MONGO_ROOT_PASSWORD}\",
+              roles: [\"root\"]
+            });
+            print(\"Root user created successfully\");
+          } else {
+            print(\"Root user already exists\");
+          }
+        } catch (e) {
+          print(\"Checking if user creation needed: \" + e.message);
+          try {
+            db.getSiblingDB(\"admin\").createUser({
+              user: \"$${MONGO_ROOT_USERNAME}\",
+              pwd: \"$${MONGO_ROOT_PASSWORD}\",
+              roles: [\"root\"]
+            });
+            print(\"Root user created successfully\");
+          } catch (e2) {
+            if (e2.message.includes(\"already exists\")) {
+              print(\"Root user already exists\");
+            } else {
+              print(\"Failed to create user: \" + e2.message);
+              throw e2;
+            }
+          }
+        }
+      ' &&
+      echo 'Waiting a moment for user to be available...' &&
+      sleep 5 &&
+      echo 'Testing authentication...' &&
       until mongosh --host mongodb-rs:27017 -u $${MONGO_ROOT_USERNAME} -p $${MONGO_ROOT_PASSWORD} --authenticationDatabase admin --eval 'db.adminCommand(\"ping\")' --quiet 2>/dev/null; do
-        echo 'Waiting for authentication...';
-        sleep 5;
+        echo 'Waiting for authentication to be ready...';
+        sleep 3;
       done &&
-      echo 'MongoDB is ready, checking replica set status...' &&
+      echo 'Authentication successful, checking replica set status...' &&
       mongosh --host mongodb-rs:27017 -u $${MONGO_ROOT_USERNAME} -p $${MONGO_ROOT_PASSWORD} --authenticationDatabase admin --quiet --eval '
         try {
           var status = rs.status();
@@ -296,8 +328,6 @@ services:
 
 secrets:
   dozzle_users:
-    external: true
-  mongodb-keyfile:
     external: true
 
 networks:
