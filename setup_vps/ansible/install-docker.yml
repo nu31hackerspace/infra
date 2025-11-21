@@ -4,11 +4,6 @@
     ssh_port: "{{ ssh_port }}"
     deploy_user: "{{ deploy_user }}"
     deploy_user_public_key: "{{ deploy_user_public_key }}"
-    allowed_ports:
-      - { name: "HTTP on 80", port: "80" }
-      - { name: "HTTP on 8080", port: "8080" }
-      - { name: "HTTPS", port: "443" }
-      - { name: "SSH", port: "{{ ssh_port }}" }
 
   hosts: all
   become: yes
@@ -130,14 +125,11 @@
         direction: outgoing
         policy: allow
 
-    - name: Allow specified ports
+    - name: Allow SSH port
       ufw:
         rule: allow
-        port: "{{ item.port }}"
+        port: "{{ ssh_port }}"
         proto: tcp
-      loop: "{{ allowed_ports }}"
-      loop_control:
-        label: "Allow {{ item.name }} on port {{ item.port }}"
 
     - name: Enable UFW firewall
       ufw:
