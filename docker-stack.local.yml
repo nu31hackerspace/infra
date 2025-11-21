@@ -4,7 +4,7 @@ services:
   mongodb:
     image: mongo:7.0.6
     ports:
-      - "27017:27017"
+      - "27018:27017"
     volumes:
       - mongodb-data:/data/db
     networks:
@@ -16,9 +16,38 @@ services:
   mongo-viewer:
     image: haohanyang/compass-web
     ports:
-      - "5000:8080"
+      - "5002:8080"
     environment:
       - CW_MONGO_URI=mongodb://mongodb:27017
+    networks:
+      - mongo
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  mongo-rs-1:
+    image: mongo:7.0.6
+    command: ["bash", "-c", "echo $MONGO_RS_KEYFILE_CONTENT > /data/keyfile && chmod 400 /data/keyfile && chown 999:999 /data/keyfile && docker-entrypoint.sh mongod --replSet rs0 --keyFile /data/keyfile --bind_ip_all"]
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_RS_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_RS_ROOT_PASSWORD}
+      - MONGO_RS_KEYFILE_CONTENT=${MONGO_RS_KEYFILE_CONTENT}
+    volumes:
+      - mongodb-rs-1-data:/data/db
+    networks:
+      - mongo
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  mongo-rs-viewer:
+    image: haohanyang/compass-web
+    ports:
+      - "5001:8080"
+    environment:
+      - CW_MONGO_URI=${MONGO_RS_URI}
+      - CW_BASIC_AUTH_USERNAME=${MONGO_RS_VIEWER_USER}
+      - CW_BASIC_AUTH_PASSWORD=${MONGO_RS_VIEWER_PASS}
     networks:
       - mongo
     deploy:
@@ -32,3 +61,4 @@ networks:
 
 volumes:
   mongodb-data:
+  mongodb-rs-1-data:
