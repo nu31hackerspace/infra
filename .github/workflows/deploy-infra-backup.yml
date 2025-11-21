@@ -74,8 +74,6 @@ jobs:
               echo "S3_ENDPOINT=${{ vars.S3_ENDPOINT }}"
               echo "MONGO_RS_ROOT_USERNAME=${{ vars.MONGO_RS_ROOT_USERNAME }}"
               echo "MONGO_RS_ROOT_PASSWORD=${{ secrets.MONGO_RS_ROOT_PASSWORD }}"
-              echo "MONGO_RS_VIEWER_USER=${{ vars.MONGO_RS_VIEWER_USER }}"
-              echo "MONGO_RS_VIEWER_PASS=${{ secrets.MONGO_RS_VIEWER_PASS }}"
               echo "MONGO_RS_URI=${{ secrets.MONGO_RS_URI }}"
               echo "MONGO_RS_KEYFILE_CONTENT=${{ secrets.MONGO_RS_KEYFILE_CONTENT }}"
             } > ./envfile

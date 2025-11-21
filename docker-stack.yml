@@ -106,8 +106,8 @@ services:
     image: haohanyang/compass-web
     environment:
       - CW_MONGO_URI=${MONGO_RS_URI}
-      - CW_BASIC_AUTH_USERNAME=${MONGO_RS_VIEWER_USER}
-      - CW_BASIC_AUTH_PASSWORD=${MONGO_RS_VIEWER_PASS}
+      - CW_BASIC_AUTH_USERNAME=${MONGO_VIEWER_USER}
+      - CW_BASIC_AUTH_PASSWORD=${MONGO_VIEWER_PASS}
     networks:
       - mongo-rs-net
       - reverse-proxy
