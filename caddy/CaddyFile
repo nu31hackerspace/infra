@@ -74,12 +74,6 @@ nest2d.online {
         redir https://nest2d.stelmashchuk.dev
 }
 
-shop.stelmashchuk.dev {
-        reverse_proxy * shop_app:3000 {
-                header_up X-Real-IP {remote_host}
-        }
-}
-
 nu31.space {
         reverse_proxy * nu31space_app:3000
 }

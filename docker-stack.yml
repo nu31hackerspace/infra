@@ -210,6 +210,81 @@ services:
       restart_policy:
         condition: none
 
+  mongo-rs-backup-hourly:
+    image: ghcr.io/vovastelmashchuk/mongo-rs-backup:${GIT_COMMIT_SHA:-latest}
+    command: ["/usr/local/bin/backup.sh"]
+    depends_on:
+      - cron
+      - mongo-rs-1
+    environment:
+      - S3_ENDPOINT=${S3_ENDPOINT}
+      - MONGO_URI=${MONGO_RS_URI}
+      - S3_BUCKET=backups
+      - S3_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID}
+      - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
+      - S3_FOLDER=mongo-rs-hourly
+    networks:
+      - mongo-rs-net
+    deploy:
+      mode: replicated
+      replicas: 0
+      labels:
+        - "swarm.cronjob.enable=true"
+        - "swarm.cronjob.schedule=0 * * * *"
+        - "swarm.cronjob.skip-running=true"
+      restart_policy:
+        condition: none
+
+  mongo-rs-backup-daily:
+    image: ghcr.io/vovastelmashchuk/mongo-rs-backup:${GIT_COMMIT_SHA:-latest}
+    command: ["/usr/local/bin/backup.sh"]
+    depends_on:
+      - cron
+      - mongo-rs-1
+    environment:
+      - S3_ENDPOINT=${S3_ENDPOINT}
+      - MONGO_URI=${MONGO_RS_URI}
+      - S3_BUCKET=backups
+      - S3_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID}
+      - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
+      - S3_FOLDER=mongo-rs-daily
+    networks:
+      - mongo-rs-net
+    deploy:
+      mode: replicated
+      replicas: 0
+      labels:
+        - "swarm.cronjob.enable=true"
+        - "swarm.cronjob.schedule=30 3 * * *"
+        - "swarm.cronjob.skip-running=true"
+      restart_policy:
+        condition: none
+
+  mongo-rs-backup-weekly:
+    image: ghcr.io/vovastelmashchuk/mongo-rs-backup:${GIT_COMMIT_SHA:-latest}
+    command: ["/usr/local/bin/backup.sh"]
+    depends_on:
+      - cron
+      - mongo-rs-1
+    environment:
+      - S3_ENDPOINT=${S3_ENDPOINT}
+      - MONGO_URI=${MONGO_RS_URI}
+      - S3_BUCKET=backups
+      - S3_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID}
+      - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
+      - S3_FOLDER=mongo-rs-weekly
+    networks:
+      - mongo-rs-net
+    deploy:
+      mode: replicated
+      replicas: 0
+      labels:
+        - "swarm.cronjob.enable=true"
+        - "swarm.cronjob.schedule=20 3 * * 2"
+        - "swarm.cronjob.skip-running=true"
+      restart_policy:
+        condition: none
+
   caddy-backup-daily:
     image: ghcr.io/vovastelmashchuk/caddy-backup:${GIT_COMMIT_SHA:-latest}
     command: ["/usr/local/bin/backup.sh"]
