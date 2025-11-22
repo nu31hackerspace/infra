@@ -18,7 +18,7 @@ compass-rs.stelmashchuk.dev {
 }
 
 mixdrinks.org {
-        reverse_proxy **mixdrinks_app:3000**
+        reverse_proxy * mixdrinks_app:3000
 }
 
 www.mixdrinks.org {
