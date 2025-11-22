@@ -95,7 +95,7 @@ docker exec -it <mongo container> mongorestore --uri mongodb://localhost:27017 -
 ### Restore database from backup
 
 ```
-backups mongorestore \
+mongorestore \
   --host 167.235.52.168 \
   --port 2017 \
   --username <root_user_name> \
