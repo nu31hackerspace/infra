@@ -18,10 +18,6 @@ dozzle.stelmashchuk.dev {
 }
 
 compass.stelmashchuk.dev {
-        reverse_proxy * infra_mongo-viewer:8080
-}
-
-compass-rs.stelmashchuk.dev {
         reverse_proxy * infra_mongo-rs-viewer:8080
 }
 

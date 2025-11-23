@@ -16,9 +16,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: mongo-backup
-            context: ./mongo-backup
-            image: mongo-backup
           - name: mongo-rs-backup
             context: ./mongo-rs-backup
             image: mongo-rs-backup

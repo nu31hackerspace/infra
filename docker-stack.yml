@@ -47,46 +47,6 @@ services:
       restart_policy:
         condition: none
 
-  mongodb:
-    image: mongo:7.0.6
-    ports:
-      - "27017:27017"
-    volumes:
-      - /opt/mongodb-data:/data/db
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
-    networks:
-      - mongo
-    deploy:
-      update_config:
-        order: start-first
-      restart_policy:
-        condition: on-failure
-        delay: 60s
-        max_attempts: 3
-        window: 60s
-
-  mongo-viewer:
-    image: haohanyang/compass-web
-    depends_on:
-      - mongodb
-    environment:
-      - CW_MONGO_URI=${MONGO_URI}
-      - CW_BASIC_AUTH_USERNAME=${MONGO_VIEWER_USER}
-      - CW_BASIC_AUTH_PASSWORD=${MONGO_VIEWER_PASS}
-    networks:
-      - mongo
-      - reverse-proxy
-    deploy:
-      update_config:
-        order: start-first
-      restart_policy:
-        condition: on-failure
-        delay: 60s
-        max_attempts: 3
-        window: 60s
-
   mongo-rs-1:
     image: mongo:7.0.6
     command: ["bash", "-c", "echo $MONGO_RS_KEYFILE_CONTENT > /data/keyfile && chmod 400 /data/keyfile && chown 999:999 /data/keyfile && docker-entrypoint.sh mongod --replSet rs0 --keyFile /data/keyfile --bind_ip_all"]
@@ -134,81 +94,6 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-
-  mongo-backup-hourly:
-    image: ghcr.io/vovastelmashchuk/mongo-backup:${GIT_COMMIT_SHA:-latest}
-    command: ["/usr/local/bin/backup.sh"]
-    depends_on:
-      - cron
-      - mongodb
-    environment:
-      - S3_ENDPOINT=${S3_ENDPOINT}
-      - MONGO_URI=${MONGO_URI}
-      - S3_BUCKET=backups
-      - S3_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID}
-      - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
-      - S3_FOLDER=mongo-hourly
-    networks:
-      - mongo
-    deploy:
-      mode: replicated
-      replicas: 0
-      labels:
-        - "swarm.cronjob.enable=true"
-        - "swarm.cronjob.schedule=0 * * * *"
-        - "swarm.cronjob.skip-running=true"
-      restart_policy:
-        condition: none
-
-  mongo-backup-daily:
-    image: ghcr.io/vovastelmashchuk/mongo-backup:${GIT_COMMIT_SHA:-latest}
-    command: ["/usr/local/bin/backup.sh"]
-    depends_on:
-      - cron
-      - mongodb
-    environment:
-      - S3_ENDPOINT=${S3_ENDPOINT}
-      - MONGO_URI=${MONGO_URI}
-      - S3_BUCKET=backups
-      - S3_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID}
-      - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
-      - S3_FOLDER=mongo-daily
-    networks:
-      - mongo
-    deploy:
-      mode: replicated
-      replicas: 0
-      labels:
-        - "swarm.cronjob.enable=true"
-        - "swarm.cronjob.schedule=30 3 * * *"
-        - "swarm.cronjob.skip-running=true"
-      restart_policy:
-        condition: none
-
-  mongo-backup-weekly:
-    image: ghcr.io/vovastelmashchuk/mongo-backup:${GIT_COMMIT_SHA:-latest}
-    command: ["/usr/local/bin/backup.sh"]
-    depends_on:
-      - cron
-      - mongodb
-    environment:
-      - S3_ENDPOINT=${S3_ENDPOINT}
-      - MONGO_URI=${MONGO_URI}
-      - S3_BUCKET=backups
-      - S3_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID}
-      - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
-      - S3_FOLDER=mongo-weekly
-    networks:
-      - mongo
-    deploy:
-      mode: replicated
-      replicas: 0
-      labels:
-        - "swarm.cronjob.enable=true"
-        - "swarm.cronjob.schedule=20 3 * * 2"
-        - "swarm.cronjob.skip-running=true"
-      restart_policy:
-        condition: none
 
   mongo-rs-backup-hourly:
     image: ghcr.io/vovastelmashchuk/mongo-rs-backup:${GIT_COMMIT_SHA:-latest}
