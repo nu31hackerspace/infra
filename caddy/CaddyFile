@@ -66,6 +66,10 @@ kickstart.stelmashchuk.dev {
         }
 }
 
+grafana.stelmashchuk.dev {
+        reverse_proxy * infra_grafana:3000
+}
+
 nest2d.online {
         redir https://nest2d.stelmashchuk.dev
 }

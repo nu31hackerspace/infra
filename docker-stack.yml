@@ -219,8 +219,6 @@ services:
 
   grafana:
     image: ghcr.io/vovastelmashchuk/grafana:${GIT_COMMIT_SHA:-latest}
-    ports:
-      - "5001:3000"
     links:
       - mongo-rs-1
     environment:
