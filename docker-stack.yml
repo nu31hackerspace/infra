@@ -223,8 +223,8 @@ services:
       - mongo-rs-1
     environment:
       - TZ=UTC
-      - GRAFANA_USER=${GRAFANA_USER}
-      - GRAFANA_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
     deploy:
       update_config:
         order: start-first
