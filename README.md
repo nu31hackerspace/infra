@@ -114,8 +114,23 @@ mongorestore --uri="mongodb://0.0.0.0:27017/" --drop --gzip --db=mixdrinks --arc
 
 ## Local infrastructure
 
-For the local infrastructure use the `docker-stack.local.yml`
+For the local infrastructure use the `docker-stack.local.yml`. This stack sets up a MongoDB Replica Set environment useful for local testing.
+
+### Services
+
+- **mongo-rs-1**: The primary MongoDB service running version 7.0.6.
+- **mongo-rs-init**: An oversized ephemeral container that waits for `mongo-rs-1` to be ready and initializes the Replica Set (`rs0`).
+- **mongo-rs-viewer**: A web-based MongoDB viewer (`haohanyang/compass-web`) exposed on port **5001**.
+
+### Usage
+
+To deploy the local stack:
+
+Add `192.168.64.2 mongo-rs-1` into `/etc/hosts` file
 
 ```sh
-docker stack deploy -c docker-stack.local.yml infra
+node local_deploy.js
 ```
+
+Once deployed, you can access the MongoDB viewer at `http://<colima_ip>:5000`.
+Credentials for the viewer can be set in your environment variables (`MONGO_VIEWER_USER`, `MONGO_VIEWER_PASS`) or will default if not specified in the stack file (check `docker-stack.local.yml` for variable usage).

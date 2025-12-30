@@ -3,6 +3,8 @@ version: "3.8"
 services:
   mongo-rs-1:
     image: mongo:7.0.6
+    ports:
+      - "27017:27017"
     command: ["bash", "-c", "echo $MONGO_RS_KEYFILE_CONTENT > /data/keyfile && chmod 400 /data/keyfile && chown 999:999 /data/keyfile && docker-entrypoint.sh mongod --replSet rs0 --keyFile /data/keyfile --bind_ip_all"]
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_RS_ROOT_USERNAME}
@@ -11,10 +13,10 @@ services:
     volumes:
       - mongodb-rs-1-data:/data/db
     networks:
-      - mongo
+      - mongo-rs-net
     deploy:
-      mode: replicated
-      replicas: 1
+      restart_policy:
+        condition: on-failure
 
   mongo-rs-init:
     image: mongo:7.0.6
@@ -30,7 +32,7 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_RS_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_RS_ROOT_PASSWORD}
     networks:
-      - mongo
+      - mongo-rs-net
     deploy:
       restart_policy:
         condition: on-failure
@@ -39,19 +41,23 @@ services:
   mongo-rs-viewer:
     image: haohanyang/compass-web
     ports:
-      - "5001:8080"
+      - "5000:8080"
     environment:
       - CW_MONGO_URI=${MONGO_RS_URI}
+      - CW_BASIC_AUTH_USERNAME=${MONGO_VIEWER_USER}
+      - CW_BASIC_AUTH_PASSWORD=${MONGO_VIEWER_PASS}
     networks:
-      - mongo
+      - mongo-rs-net
     deploy:
-      mode: replicated
-      replicas: 1
+      restart_policy:
+        condition: on-failure
 
 networks:
-  mongo:
+  mongo-rs-net:
     driver: overlay
     attachable: true
+    driver_opts:
+      encrypted: "true"
 
 volumes:
   mongodb-rs-1-data:
