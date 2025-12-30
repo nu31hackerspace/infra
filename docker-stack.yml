@@ -217,6 +217,24 @@ services:
     networks:
       - reverse-proxy
 
+  grafana:
+    image: ghcr.io/vovastelmashchuk/grafana:${GIT_COMMIT_SHA:-latest}
+    ports:
+      - "5001:3000"
+    links:
+      - mongo-rs-1
+    environment:
+      - TZ=UTC
+      - GRAFANA_USER=${GRAFANA_USER}
+      - GRAFANA_PASSWORD=${GRAFANA_PASSWORD}
+    deploy:
+      update_config:
+        order: start-first
+      restart_policy:
+        condition: on-failure
+    networks:
+      - reverse-proxy
+
 secrets:
   dozzle_users:
     external: true

@@ -25,6 +25,9 @@ jobs:
           - name: caddy-backup
             context: ./caddy-backup
             image: caddy-backup
+          - name: grafana
+            context: ./grafana
+            image: grafana
     
     runs-on: ubuntu-latest
     permissions:
@@ -76,6 +79,8 @@ jobs:
               echo "MONGO_RS_ROOT_PASSWORD=${{ secrets.MONGO_RS_ROOT_PASSWORD }}"
               echo "MONGO_RS_URI=${{ secrets.MONGO_RS_URI }}"
               echo "MONGO_RS_KEYFILE_CONTENT=${{ secrets.MONGO_RS_KEYFILE_CONTENT }}"
+              echo "GRAFANA_USER=${{ vars.GRAFANA_USER }}"
+              echo "GRAFANA_PASSWORD=${{ secrets.GRAFANA_PASSWORD }}"
             } > ./envfile
 
       - name: Docker Stack Deploy

@@ -42,10 +42,28 @@ services:
     image: haohanyang/compass-web
     ports:
       - "5000:8080"
+    links:
+      - mongo-rs-1
     environment:
       - CW_MONGO_URI=${MONGO_RS_URI}
       - CW_BASIC_AUTH_USERNAME=${MONGO_VIEWER_USER}
       - CW_BASIC_AUTH_PASSWORD=${MONGO_VIEWER_PASS}
+    networks:
+      - mongo-rs-net
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  grafana:
+    image: infra-grafana:local
+    ports:
+      - "5001:3000"
+    links:
+      - mongo-rs-1
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=haohanyang-mongodb-datasource
     networks:
       - mongo-rs-net
     deploy:
