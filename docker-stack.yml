@@ -232,6 +232,7 @@ services:
         condition: on-failure
     networks:
       - reverse-proxy
+      - mongo-rs-net
 
 secrets:
   dozzle_users:
