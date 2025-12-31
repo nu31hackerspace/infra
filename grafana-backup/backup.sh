@@ -11,22 +11,21 @@ set -euo pipefail
 TS="$(date +'%Y-%m-%d_%H-%M')"
 ARCHIVE="/tmp/grafana-backup-${TS}.tar.gz"
 
-echo "[+] Archiving Grafana data from ${GRAFANA_DATA_DIR} → ${ARCHIVE}"
-
-if [ ! -d "${GRAFANA_DATA_DIR}" ]; then
-    echo "Error: Directory ${GRAFANA_DATA_DIR} does not exist."
+if [ ! -e "${GRAFANA_DATA_DIR}" ]; then
+    echo "Error: Path ${GRAFANA_DATA_DIR} does not exist."
     exit 1
 fi
 
-ls -la "${GRAFANA_DATA_DIR}"
+echo "Archiving Grafana data from ${GRAFANA_DATA_DIR} → ${ARCHIVE}"
+
 tar -czf "${ARCHIVE}" -C "$(dirname "${GRAFANA_DATA_DIR}")" "$(basename "${GRAFANA_DATA_DIR}")"
 
 UPLOAD_PATH="s3://${S3_BUCKET}/${S3_FOLDER}/grafana-backup-${TS}.tar.gz"
-echo "[+] Uploading to S3: ${UPLOAD_PATH}"
+echo "Uploading to S3: ${UPLOAD_PATH}"
 
 export AWS_ACCESS_KEY_ID="$S3_ACCESS_KEY_ID"
 export AWS_SECRET_ACCESS_KEY="$S3_SECRET_ACCESS_KEY"
 
 aws --endpoint-url="$S3_ENDPOINT" s3 cp "$ARCHIVE" "$UPLOAD_PATH"
 
-echo "[+] Done."
+echo "Done."
