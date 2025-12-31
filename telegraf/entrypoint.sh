@@ -18,10 +18,6 @@ if [ -e /var/run/docker.sock ]; then
     usermod -aG "$TARGET_GROUP" telegraf
 fi
 
-    echo "Adding telegraf user to group '$TARGET_GROUP'"
-    usermod -aG "$TARGET_GROUP" telegraf
-fi
-
 # We are running as root, so we need to manually drop privileges to 'telegraf'
 # effectively after updating the groups.
 # Note: standard /entrypoint.sh might reset or ignore our group changes if it uses setpriv strictly.
