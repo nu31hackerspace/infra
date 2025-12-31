@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Required environment variables:
 : "${GRAFANA_DATA_DIR:?need to set GRAFANA_DATA_DIR}"
 : "${S3_BUCKET:?need to set S3_BUCKET}"
 : "${S3_ACCESS_KEY_ID:?need to set S3_ACCESS_KEY_ID}"
@@ -14,7 +13,6 @@ ARCHIVE="/tmp/grafana-backup-${TS}.tar.gz"
 
 echo "[+] Archiving Grafana data from ${GRAFANA_DATA_DIR} → ${ARCHIVE}"
 
-# Check if directory exists
 if [ ! -d "${GRAFANA_DATA_DIR}" ]; then
     echo "Error: Directory ${GRAFANA_DATA_DIR} does not exist."
     exit 1
