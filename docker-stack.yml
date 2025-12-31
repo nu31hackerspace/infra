@@ -264,6 +264,7 @@ services:
   telegraf:
     image: ghcr.io/vovastelmashchuk/telegraf:${GIT_COMMIT_SHA:-latest}
     user: root
+    entrypoint: "telegraf"
     hostname: "{{.Node.Hostname}}"
     networks:
       - mongo-rs-net
