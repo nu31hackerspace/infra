@@ -244,7 +244,7 @@ services:
       - grafana
     environment:
       - S3_ENDPOINT=${S3_ENDPOINT}
-      - GRAFANA_DATA_DIR=/var/lib/grafana
+      - GRAFANA_DATA_DIR=grafana-data
       - S3_BUCKET=backups
       - S3_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID}
       - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
@@ -267,9 +267,6 @@ secrets:
 
 networks:
   reverse-proxy:
-    driver: overlay
-    attachable: true
-  mongo:
     driver: overlay
     attachable: true
   mongo-rs-net:
