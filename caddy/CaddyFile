@@ -29,16 +29,6 @@ www.mixdrinks.org {
         redir https://mixdrinks.org{uri}
 }
 
-ypod.stelmashchuk.dev {
-        reverse_proxy * ypod_app:3000 {
-                header_up X-Real-IP {remote_host}
-        }
-}
-
-http://ypod.stelmashchuk.dev {
-        reverse_proxy * ypod_app:3000
-}
-
 hardandsoft.stelmashchuk.dev {
         rewrite /files/rss.xml /api/podcast/android-story/rss.xml
         rewrite /rss.xml /api/podcast/android-story/rss.xml
