@@ -263,6 +263,7 @@ services:
 
   telegraf:
     image: ghcr.io/vovastelmashchuk/telegraf:${GIT_COMMIT_SHA:-latest}
+    user: root
     hostname: "{{.Node.Hostname}}"
     networks:
       - mongo-rs-net
