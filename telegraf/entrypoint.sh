@@ -12,13 +12,16 @@ if [ -e /var/run/docker.sock ]; then
     if [ "$(id -u)" = "0" ]; then
          echo "Switching to user 'telegraf' with supplementary group GID $SOCKET_GID"
          
-         # Use setpriv to run the command as telegraf user/group with the socket group added
-         # --reuid=telegraf: Real User ID
-         # --regid=telegraf: Real Group ID
-         # --init-groups: Initialize supplementary groups from /etc/group (for telegraf user)
-         # --groups=$SOCKET_GID: Add the docker socket group
+         # Get existing groups for telegraf user (comma separated)
+         EXISTING_GROUPS=$(id -Gn telegraf | tr ' ' ',')
          
-         exec setpriv --reuid=telegraf --regid=telegraf --init-groups --groups="$SOCKET_GID" -- $CMD
+         # Combine with the socket GID
+         ALL_GROUPS="$EXISTING_GROUPS,$SOCKET_GID"
+         
+         # Use setpriv with explicit --groups list (merging existing + new)
+         # We cannot use --init-groups with --groups
+         
+         exec setpriv --reuid=telegraf --regid=telegraf --groups="$ALL_GROUPS" -- $CMD
     else
         echo "Not running as root, cannot switch users. Continuing as current user..."
     fi
