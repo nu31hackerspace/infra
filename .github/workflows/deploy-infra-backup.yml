@@ -28,6 +28,9 @@ jobs:
           - name: grafana
             context: ./grafana
             image: grafana
+          - name: grafana-backup
+            context: ./grafana-backup
+            image: grafana-backup
     
     runs-on: ubuntu-latest
     permissions:
