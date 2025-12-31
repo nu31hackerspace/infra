@@ -263,7 +263,7 @@ services:
 
   telegraf:
     image: ghcr.io/vovastelmashchuk/telegraf:${GIT_COMMIT_SHA:-latest}
-    user: deploy
+    user: root
     hostname: "{{.Node.Hostname}}"
     networks:
       - mongo-rs-net
@@ -273,10 +273,10 @@ services:
       - HOST_ETC=/host/etc
       - MONGO_URL=mongodb://${MONGO_RS_ROOT_USERNAME}:${MONGO_RS_ROOT_PASSWORD}@mongo-rs-1:27017/?replicaSet=rs0&authSource=admin
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /etc:/host/etc:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /proc:/host/proc
+      - /sys:/host/sys
+      - /etc:/host/etc
     deploy:
       mode: global
       restart_policy:
