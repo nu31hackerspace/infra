@@ -1,4 +1,4 @@
-FROM mongo:7.0.6
+FROM mongo:7.0.29
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends python3-pip ca-certificates \
