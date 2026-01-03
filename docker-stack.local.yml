@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   mongo-rs-1:
-    image: mongo:7.0.29
+    image: mongo:8.2.3
     ports:
       - "27017:27017"
     command: ["bash", "-c", "echo $MONGO_RS_KEYFILE_CONTENT > /data/keyfile && chmod 400 /data/keyfile && chown 999:999 /data/keyfile && docker-entrypoint.sh mongod --replSet rs0 --keyFile /data/keyfile --bind_ip_all"]
@@ -19,7 +19,7 @@ services:
         condition: on-failure
 
   mongo-rs-init:
-    image: mongo:7.0.29
+    image: mongo:8.2.3
     command:
       - bash
       - -c

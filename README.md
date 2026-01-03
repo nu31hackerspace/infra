@@ -118,7 +118,7 @@ For the local infrastructure use the `docker-stack.local.yml`. This stack sets u
 
 ### Services
 
-- **mongo-rs-1**: The primary MongoDB service running version 7.0.6.
+- **mongo-rs-1**: The primary MongoDB service running version 8.2.3.
 - **mongo-rs-init**: An oversized ephemeral container that waits for `mongo-rs-1` to be ready and initializes the Replica Set (`rs0`).
 - **mongo-rs-viewer**: A web-based MongoDB viewer (`haohanyang/compass-web`) exposed on port **5001**.
 
