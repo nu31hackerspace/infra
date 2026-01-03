@@ -18,7 +18,7 @@ const askQuestion = (query, defaultValue) => {
 };
 
 const generateKeyFileContent = () => {
-    return crypto.randomBytes(756).toString('base64');
+    return crypto.randomBytes(128).toString('base64');
 };
 
 const main = async () => {
