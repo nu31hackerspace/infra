@@ -87,6 +87,9 @@ jobs:
               echo "MONGO_RS_KEYFILE_CONTENT=${{ secrets.MONGO_RS_KEYFILE_CONTENT }}"
               echo "GRAFANA_USER=${{ vars.GRAFANA_USER }}"
               echo "GRAFANA_PASSWORD=${{ secrets.GRAFANA_PASSWORD }}"
+              echo "MONGO_NU_31_URI=${{ secrets.MONGO_NU_31_URI }}"
+              echo "MONGO_NU31_VIEWER_USER=${{ vars.MONGO_NU31_VIEWER_USER }}"
+              echo "MONGO_NU31_VIEWER_PASS=${{ secrets.MONGO_NU31_VIEWER_PASS }}"
             } > ./envfile
 
       - name: Docker Stack Deploy
