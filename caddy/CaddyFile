@@ -69,3 +69,7 @@ grafana.stelmashchuk.dev {
 nu31.space {
         reverse_proxy * nu31space_app:3000
 }
+
+compass.nu31.space {
+        reverse_proxy * mongo-nu31-viewer:8080
+}

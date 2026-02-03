@@ -83,7 +83,7 @@ services:
         max_attempts: 5
 
   mongo-rs-viewer:
-    image: haohanyang/compass-web
+    image: haohanyang/compass-web:0.3.1
     environment:
       - CW_MONGO_URI=${MONGO_RS_URI}
       - CW_BASIC_AUTH_USERNAME=${MONGO_VIEWER_USER}
@@ -95,6 +95,19 @@ services:
       restart_policy:
         condition: on-failure
 
+  mongo-nu31-viewer:
+    image: haohanyang/compass-web:0.3.1
+    environment:
+      - CW_MONGO_URI=${MONGO_NU_31_URI}
+      - CW_BASIC_AUTH_USERNAME=${MONGO_NU31_VIEWER_USER}
+      - CW_BASIC_AUTH_PASSWORD=${MONGO_NU31_VIEWER_PASS}
+    networks:
+      - mongo-rs-net
+      - reverse-proxy
+    deploy:
+      restart_policy:
+        condition: on-failure
+  
   mongo-rs-backup-hourly:
     image: ghcr.io/vovastelmashchuk/mongo-rs-backup:${GIT_COMMIT_SHA:-latest}
     command: ["/usr/local/bin/backup.sh"]
