@@ -156,3 +156,5 @@ docker run --rm \
   alpine \
   chown 472:472 /data/grafana.db
 ```
+
+To create own infrastructure setup, fork the repository and update all need github action secrets and variables.
