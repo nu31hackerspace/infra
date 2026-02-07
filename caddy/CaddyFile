@@ -62,6 +62,12 @@ kickstart.stelmashchuk.dev {
         }
 }
 
+velonuxt.stelmashchuk.dev {
+        reverse_proxy * velonuxt_app:3000 {
+                header_up X-Real-IP {remote_host}
+        }
+}
+
 grafana.stelmashchuk.dev {
         reverse_proxy * infra_grafana:3000
 }
