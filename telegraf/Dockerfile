@@ -1,4 +1,4 @@
-FROM telegraf:1.37.0
+FROM telegraf:1.37.1
 
 COPY telegraf.conf /etc/telegraf/telegraf.conf
 COPY entrypoint.sh /custom-entrypoint.sh
