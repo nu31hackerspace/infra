@@ -10,6 +10,7 @@ env:
   DOCKER_STACK_NAME: infra
   HOST: ${{ vars.HOST }}
   OWNER_NAME: vovastelmashchuk
+  ROOT_SSH_PRIVATE_KEY: ${{ secrets.ROOT_SSH_PRIVATE_KEY }}
 
 jobs:
   build-and-push:
@@ -100,5 +101,5 @@ jobs:
           file: docker-stack.yml
           host: ${{ env.HOST }}
           user: root
-          ssh_key: ${{ secrets.ROOT_SSH_PRIVATE_KEY }}
+          ssh_key: ${{ env.ROOT_SSH_PRIVATE_KEY }}
           env_file: ./envfile
