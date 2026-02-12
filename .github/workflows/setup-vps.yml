@@ -12,11 +12,6 @@ on:
         required: true
         default: "22"
         type: string
-      deploy_user:
-        description: "Deploy user name"
-        required: true
-        default: "deploy"
-        type: string
 
 jobs:
   setup-vps:
@@ -47,7 +42,7 @@ jobs:
       - name: Run Ansible playbook
         run: |
           ansible-playbook -i /tmp/inventory setup_vps/ansible/install-docker.yml \
-            --extra-vars "ssh_port=${{ inputs.ssh_port }} deploy_user=${{ inputs.deploy_user }} deploy_user_public_key='${{ secrets.DEPLOY_USER_PUBLIC_KEY }}'"
+            --extra-vars "ssh_port=${{ inputs.ssh_port }} deploy_user_public_key='${{ secrets.DEPLOY_USER_PUBLIC_KEY }}'"
 
       - name: Display connection info
         if: success()
@@ -56,7 +51,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Connect to your VPS:" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo "ssh -p ${{ inputs.ssh_port }} ${{ inputs.deploy_user }}@${{ inputs.vps_ip }}" >> $GITHUB_STEP_SUMMARY
+          echo "ssh -p ${{ inputs.ssh_port }} deploy@${{ inputs.vps_ip }}" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Next step: initialize Docker Swarm on the VPS:" >> $GITHUB_STEP_SUMMARY

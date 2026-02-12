@@ -2,7 +2,6 @@
 - name: Install Docker on Ubuntu
   vars:
     ssh_port: "{{ ssh_port }}"
-    deploy_user: "{{ deploy_user }}"
     deploy_user_public_key: "{{ deploy_user_public_key }}"
 
   hosts: all
