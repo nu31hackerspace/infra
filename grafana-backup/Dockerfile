@@ -1,5 +1,4 @@
-ARG UBUNTU_VERSION
-FROM ubuntu:${UBUNTU_VERSION}
+FROM ubuntu:22.04
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends python3-pip ca-certificates \
