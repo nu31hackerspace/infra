@@ -103,9 +103,6 @@ while true; do
     fi
 done
 
-# Prompt for deploy user (default: deploy)
-prompt_input "Enter deploy user name" "deploy_user" "deploy" "true"
-
 # Prompt for SSH public key
 echo -e "${YELLOW}Enter your SSH public key (from 1Password or ~/.ssh/id_rsa.pub):${NC}"
 echo -e "${BLUE}You can copy it from 1Password or run: cat ~/.ssh/id_rsa.pub${NC}"
@@ -135,7 +132,6 @@ echo -e "${GREEN}================================${NC}"
 echo -e "${BLUE}VPS IP:${NC} $vps_ip"
 echo -e "${BLUE}SSH User:${NC} $ssh_user"
 echo -e "${BLUE}SSH Port:${NC} $ssh_port"
-echo -e "${BLUE}Deploy User:${NC} $deploy_user"
 echo -e "${BLUE}SSH Private Key:${NC} $ssh_private_key"
 echo -e "${BLUE}Public Key:${NC} ${deploy_user_public_key:0:50}..."
 echo ""
@@ -161,9 +157,9 @@ vps-server ansible_host=$vps_ip ansible_user=$ssh_user ansible_ssh_private_key_f
 EOF
 
 # Run the Ansible playbook
-ansible-playbook -i "$temp_inventory" ansible/install-docker.yml \
+ansible-playbook -i "$temp_inventory" setup_vps/ansible/install-docker.yml \
   --limit "vps-servers" \
-  --extra-vars "ssh_port=$ssh_port deploy_user=$deploy_user deploy_user_public_key='$deploy_user_public_key'"
+  --extra-vars "ssh_port=$ssh_port deploy_user_public_key='$deploy_user_public_key'"
 
 # Clean up temporary inventory
 rm -f "$temp_inventory"
@@ -176,7 +172,7 @@ if [ $? -eq 0 ]; then
     echo -e "${GREEN}================================${NC}"
     echo ""
     echo -e "${BLUE}You can now connect to your VPS using:${NC}"
-    echo -e "${YELLOW}ssh -p $ssh_port $deploy_user@$vps_ip${NC}"
+    echo -e "${YELLOW}ssh -p $ssh_port root@$vps_ip${NC}"
     echo ""
     echo -e "${BLUE}Firewall ports opened:${NC}"
     echo -e "${YELLOW}- SSH: $ssh_port${NC}"

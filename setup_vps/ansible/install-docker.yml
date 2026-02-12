@@ -108,6 +108,24 @@
         port: "{{ ssh_port }}"
         proto: tcp
 
+    - name: Allow HTTP port
+      ufw:
+        rule: allow
+        port: "80"
+        proto: tcp
+
+    - name: Allow HTTP alt port
+      ufw:
+        rule: allow
+        port: "8080"
+        proto: tcp
+
+    - name: Allow HTTPS port
+      ufw:
+        rule: allow
+        port: "443"
+        proto: tcp
+
     - name: Enable UFW firewall
       ufw:
         state: enabled
