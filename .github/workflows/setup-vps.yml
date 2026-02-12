@@ -51,7 +51,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Connect to your VPS:" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo "ssh -p ${{ inputs.ssh_port }} deploy@${{ inputs.vps_ip }}" >> $GITHUB_STEP_SUMMARY
+          echo "ssh -p ${{ inputs.ssh_port }} root@${{ inputs.vps_ip }}" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Next step: initialize Docker Swarm on the VPS:" >> $GITHUB_STEP_SUMMARY

@@ -8,7 +8,7 @@ on:
 env:
   REGISTRY: ghcr.io
   DOCKER_STACK_NAME: infra
-  DEPLOY_USER: deploy
+  DEPLOY_USER: root
   HOST: ${{ vars.HOST }}
   OWNER_NAME: vovastelmashchuk
 

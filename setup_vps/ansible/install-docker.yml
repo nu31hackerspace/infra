@@ -50,31 +50,9 @@
         state: started
         enabled: yes
 
-    - name: Create deploy user
-      user:
-        name: deploy
-        shell: /bin/bash
-        home: /home/deploy
-        create_home: yes
-        state: present
-
-    - name: Add deploy user to docker group
-      user:
-        name: deploy
-        groups: docker
-        append: yes
-
-    - name: Create .ssh directory for deploy user
-      file:
-        path: /home/deploy/.ssh
-        state: directory
-        owner: deploy
-        group: deploy
-        mode: "0700"
-
-    - name: Set up SSH key for deploy user (optional)
+    - name: Set up SSH key for deploy
       authorized_key:
-        user: deploy
+        user: root
         state: present
         key: "{{ deploy_user_public_key }}"
 

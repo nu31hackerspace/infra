@@ -19,9 +19,9 @@ Before running, add the following GitHub secrets in **Settings > Secrets and var
 | Secret | Description |
 |---|---|
 | `VPS_SSH_PRIVATE_KEY` | SSH private key for root access to the new VPS |
-| `DEPLOY_USER_PUBLIC_KEY` | SSH public key to authorize for the deploy user |
+| `DEPLOY_USER_PUBLIC_KEY` | SSH public key to authorize for deploy (added to root) |
 
-Then go to **Actions > Setup VPS > Run workflow** and provide the VPS IP, SSH port, and deploy user name.
+Then go to **Actions > Setup VPS > Run workflow** and provide the VPS IP and SSH port.
 
 ### Option 2: Local script
 
@@ -39,13 +39,7 @@ Run the command in project root and follow the instructions:
 4. Adds Docker's official repository
 5. Installs Docker CE
 6. Starts and enables the Docker service
-7. Creates a dedicated `deploy` user for deploy operations
-8. Sets up SSH directory for the deploy user
-
-The playbook creates a dedicated 'deploy' user that:
-- Has access to Docker commands without sudo
-- Is specifically designed for deployment operations
-- Has a home directory at `/home/deploy`
+7. Adds the deploy SSH public key to root's authorized keys
 
 ## Docker Swarm Setup
 
