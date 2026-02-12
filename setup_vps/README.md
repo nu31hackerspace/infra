@@ -18,8 +18,8 @@ Before running, add the following GitHub secrets in **Settings > Secrets and var
 
 | Secret | Description |
 |---|---|
-| `VPS_SSH_PRIVATE_KEY` | SSH private key for root access to the new VPS |
-| `DEPLOY_USER_PUBLIC_KEY` | SSH public key to authorize for deploy (added to root) |
+| `ROOT_SSH_PRIVATE_KEY` | SSH private key for root access |
+| `ROOT_SSH_PUBLIC_KEY` | SSH public key to authorize for root |
 
 Then go to **Actions > Setup VPS > Run workflow** and provide the VPS IP and SSH port.
 
@@ -32,14 +32,14 @@ Run the command in project root and follow the instructions:
 
 ## What the script does
 
-0. Ask all prerequires input values such as server ip, ssh key for deploy and ssh port
+0. Ask all prerequisite input values such as server ip, ssh key and ssh port
 1. Updates the apt cache
 2. Installs required packages (curl, gnupg, etc.)
 3. Adds Docker's official GPG key
 4. Adds Docker's official repository
 5. Installs Docker CE
 6. Starts and enables the Docker service
-7. Adds the deploy SSH public key to root's authorized keys
+7. Adds the SSH public key to root's authorized keys
 
 ## Docker Swarm Setup
 

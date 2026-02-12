@@ -2,7 +2,7 @@
 - name: Install Docker on Ubuntu
   vars:
     ssh_port: "{{ ssh_port }}"
-    deploy_user_public_key: "{{ deploy_user_public_key }}"
+    root_public_key: "{{ root_public_key }}"
 
   hosts: all
   become: yes
@@ -50,11 +50,11 @@
         state: started
         enabled: yes
 
-    - name: Set up SSH key for deploy
+    - name: Set up SSH key for root
       authorized_key:
         user: root
         state: present
-        key: "{{ deploy_user_public_key }}"
+        key: "{{ root_public_key }}"
 
     - name: Backup SSH configuration
       copy:
@@ -81,55 +81,6 @@
         name: ssh
         state: restarted
 
-    - name: Install UFW firewall
-      apt:
-        name: ufw
-        state: present
-
-    - name: Reset UFW to default policy
-      ufw:
-        state: reset
-
-    - name: Set UFW default policies
-      ufw:
-        direction: "{{ item }}"
-        policy: deny
-      loop:
-        - incoming
-
-    - name: Allow outgoing traffic
-      ufw:
-        direction: outgoing
-        policy: allow
-
-    - name: Allow SSH port
-      ufw:
-        rule: allow
-        port: "{{ ssh_port }}"
-        proto: tcp
-
-    - name: Allow HTTP port
-      ufw:
-        rule: allow
-        port: "80"
-        proto: tcp
-
-    - name: Allow HTTP alt port
-      ufw:
-        rule: allow
-        port: "8080"
-        proto: tcp
-
-    - name: Allow HTTPS port
-      ufw:
-        rule: allow
-        port: "443"
-        proto: tcp
-
-    - name: Enable UFW firewall
-      ufw:
-        state: enabled
-
     - name: Verify Docker installation
       command: docker --version
       register: docker_version
@@ -142,7 +93,3 @@
     - name: Display SSH port change
       debug:
         msg: "SSH port changed to {{ ssh_port }}"
-
-    - name: Display firewall status
-      debug:
-        msg: "Firewall enabled with SSH port {{ ssh_port }}, HTTP (80, 8080), and HTTPS (443) allowed"

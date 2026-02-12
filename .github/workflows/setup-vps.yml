@@ -28,7 +28,7 @@ jobs:
       - name: Configure SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.VPS_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.ROOT_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ inputs.vps_ip }} >> ~/.ssh/known_hosts 2>/dev/null
 
@@ -42,7 +42,7 @@ jobs:
       - name: Run Ansible playbook
         run: |
           ansible-playbook -i /tmp/inventory setup_vps/ansible/install-docker.yml \
-            --extra-vars "ssh_port=${{ inputs.ssh_port }} deploy_user_public_key='${{ secrets.DEPLOY_USER_PUBLIC_KEY }}'"
+            --extra-vars "ssh_port=${{ inputs.ssh_port }} root_public_key='${{ secrets.ROOT_SSH_PUBLIC_KEY }}'"
 
       - name: Display connection info
         if: success()

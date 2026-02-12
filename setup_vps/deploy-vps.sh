@@ -106,10 +106,10 @@ done
 # Prompt for SSH public key
 echo -e "${YELLOW}Enter your SSH public key (from 1Password or ~/.ssh/id_rsa.pub):${NC}"
 echo -e "${BLUE}You can copy it from 1Password or run: cat ~/.ssh/id_rsa.pub${NC}"
-read -r deploy_user_public_key
+read -r root_public_key
 
 # Validate that public key is provided
-if [ -z "$deploy_user_public_key" ]; then
+if [ -z "$root_public_key" ]; then
     echo -e "${RED}SSH public key is required. Please provide your public key.${NC}"
     exit 1
 fi
@@ -133,7 +133,7 @@ echo -e "${BLUE}VPS IP:${NC} $vps_ip"
 echo -e "${BLUE}SSH User:${NC} $ssh_user"
 echo -e "${BLUE}SSH Port:${NC} $ssh_port"
 echo -e "${BLUE}SSH Private Key:${NC} $ssh_private_key"
-echo -e "${BLUE}Public Key:${NC} ${deploy_user_public_key:0:50}..."
+echo -e "${BLUE}Public Key:${NC} ${root_public_key:0:50}..."
 echo ""
 
 # Confirm deployment
@@ -159,7 +159,7 @@ EOF
 # Run the Ansible playbook
 ansible-playbook -i "$temp_inventory" setup_vps/ansible/install-docker.yml \
   --limit "vps-servers" \
-  --extra-vars "ssh_port=$ssh_port deploy_user_public_key='$deploy_user_public_key'"
+  --extra-vars "ssh_port=$ssh_port root_public_key='$root_public_key'"
 
 # Clean up temporary inventory
 rm -f "$temp_inventory"
@@ -173,12 +173,6 @@ if [ $? -eq 0 ]; then
     echo ""
     echo -e "${BLUE}You can now connect to your VPS using:${NC}"
     echo -e "${YELLOW}ssh -p $ssh_port root@$vps_ip${NC}"
-    echo ""
-    echo -e "${BLUE}Firewall ports opened:${NC}"
-    echo -e "${YELLOW}- SSH: $ssh_port${NC}"
-    echo -e "${YELLOW}- HTTP: 80${NC}"
-    echo -e "${YELLOW}- HTTP: 8080${NC}"
-    echo -e "${YELLOW}- HTTPS: 443${NC}"
     echo ""
 else
     echo ""

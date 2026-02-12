@@ -8,7 +8,6 @@ on:
 env:
   REGISTRY: ghcr.io
   DOCKER_STACK_NAME: infra
-  DEPLOY_USER: root
   HOST: ${{ vars.HOST }}
   OWNER_NAME: vovastelmashchuk
 
@@ -100,6 +99,6 @@ jobs:
           name: ${{ env.DOCKER_STACK_NAME }}
           file: docker-stack.yml
           host: ${{ env.HOST }}
-          user: ${{ env.DEPLOY_USER }}
-          ssh_key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }} 
+          user: root
+          ssh_key: ${{ secrets.ROOT_SSH_PRIVATE_KEY }}
           env_file: ./envfile
