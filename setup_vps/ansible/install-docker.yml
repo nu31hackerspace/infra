@@ -1,8 +1,8 @@
 ---
 - name: Install Docker on Ubuntu
   vars:
-    ssh_port: "{{ ssh_port }}"
-    root_public_key: "{{ root_public_key }}"
+    docker_version: "5:27.5.1-1~ubuntu.24.04~noble"
+    containerd_version: "1.7.25-1"
 
   hosts: all
   become: yes
@@ -29,7 +29,7 @@
 
     - name: Add Docker repository
       apt_repository:
-        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_facts['distribution_release'] }} stable"
         state: present
 
     - name: Update apt cache after adding repository
@@ -39,9 +39,9 @@
     - name: Install Docker CE
       apt:
         name:
-          - docker-ce
-          - docker-ce-cli
-          - containerd.io
+          - "docker-ce={{ docker_version }}"
+          - "docker-ce-cli={{ docker_version }}"
+          - "containerd.io={{ containerd_version }}"
         state: present
 
     - name: Start and enable Docker service
@@ -50,46 +50,26 @@
         state: started
         enabled: yes
 
-    - name: Set up SSH key for root
-      authorized_key:
-        user: root
-        state: present
-        key: "{{ root_public_key }}"
-
-    - name: Backup SSH configuration
-      copy:
-        src: /etc/ssh/sshd_config
-        dest: /etc/ssh/sshd_config.backup
-        remote_src: yes
-        backup: yes
-
-    - name: Change SSH port
-      lineinfile:
-        path: /etc/ssh/sshd_config
-        regexp: "^#?Port "
-        line: "Port {{ ssh_port }}"
-        state: present
-
-    - name: Ensure SSH service is enabled
-      systemd:
-        name: ssh
-        enabled: yes
-        state: started
-
-    - name: Restart SSH service
-      systemd:
-        name: ssh
-        state: restarted
+    - name: Initialize Docker Swarm
+      command: docker swarm init
+      register: swarm_result
+      changed_when: "'Swarm initialized' in swarm_result.stdout"
+      failed_when: "swarm_result.rc != 0 and 'This node is already part of a swarm' not in swarm_result.stderr"
 
     - name: Verify Docker installation
       command: docker --version
-      register: docker_version
+      register: docker_version_output
       changed_when: false
 
     - name: Display Docker version
       debug:
-        msg: "Docker version: {{ docker_version.stdout }}"
+        msg: "Docker version: {{ docker_version_output.stdout }}"
+    
+    - name: Get Docker nodes
+      command: docker node ls
+      register: docker_nodes
+      changed_when: false
 
-    - name: Display SSH port change
+    - name: Display Docker nodes
       debug:
-        msg: "SSH port changed to {{ ssh_port }}"
+        msg: "{{ docker_nodes.stdout_lines }}"

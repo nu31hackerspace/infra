@@ -4,9 +4,9 @@ This Ansible playbook installs Docker CE (Community Edition) on Ubuntu machines 
 
 ## Prerequisites
 
-- Ansible installed on your control machine
-- SSH access to target Ubuntu servers
-- Sudo privileges on target servers
+- Ansible installed on your control machine (non VSP)
+- SSH access to target Ubuntu server (VPS) via ssh key
+- Sudo privileges on target server
 
 ## Usage
 
@@ -23,36 +23,20 @@ Before running, add the following GitHub secrets in **Settings > Secrets and var
 
 Then go to **Actions > Setup VPS > Run workflow** and provide the VPS IP and SSH port.
 
-### Option 2: Local script
+### Option 2: Run locally
 
-Run the command in project root and follow the instructions:
 ```sh
- ./setup_vps/deploy-vps.sh
+ansible-playbook -i "<VPS_IP>," setup_vps/ansible/install-docker.yml \
+  -u root --private-key ~/.ssh/id_rsa \
+  --extra-vars "ssh_port=<SSH_PORT> root_public_key='$(cat ~/.ssh/id_rsa.pub)'"
 ```
 
-## What the script does
+Replace `<VPS_IP>` and `<SSH_PORT>` with your actual values.
 
-0. Ask all prerequisite input values such as server ip, ssh key and ssh port
-1. Updates the apt cache
-2. Installs required packages (curl, gnupg, etc.)
-3. Adds Docker's official GPG key
-4. Adds Docker's official repository
-5. Installs Docker CE
-6. Starts and enables the Docker service
-7. Adds the SSH public key to root's authorized keys
+## Help information
 
-## Docker Swarm Setup
+### Install Ansible on MacOS
 
-I am personal use the docker swarm with only one manager node just for docker as services. It's just make life easier and deloy smoth.
-
-Once Docker is installed, you can initialize Docker Swarm on your manager node:
-
-```bash
-docker swarm init
+```sh
+brew install ansible
 ```
-
-(Optional) And join worker nodes to the swarm:
-
-```bash
-docker swarm join --token <token> <manager-ip>:2377
-``` 
