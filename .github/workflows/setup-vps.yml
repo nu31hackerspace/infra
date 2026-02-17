@@ -58,7 +58,4 @@ jobs:
           echo "ssh -p ${{ inputs.ssh_port }} root@${{ inputs.vps_ip }}" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Next step: initialize Docker Swarm on the VPS:" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo "docker swarm init" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "Next step: init the all needed github action secret and variable" >> $GITHUB_STEP_SUMMARY
