@@ -87,7 +87,6 @@ jobs:
               echo "MONGO_RS_ROOT_PASSWORD=${{ secrets.MONGO_RS_ROOT_PASSWORD }}"
               echo "MONGO_RS_URI=${{ secrets.MONGO_RS_URI }}"
               echo "MONGO_RS_KEYFILE_CONTENT=${{ secrets.MONGO_RS_KEYFILE_CONTENT }}"
-              echo "GRAFANA_USER=${{ env.ADMIN_USER }}"
               echo "GRAFANA_PASSWORD=${{ secrets.GRAFANA_PASSWORD }}"
               echo "OWNER_NAME=${{ env.OWNER_NAME }}"
               echo "MONGO_NU_31_URI=${{ secrets.MONGO_NU_31_URI }}"

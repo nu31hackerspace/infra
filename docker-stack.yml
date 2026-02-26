@@ -238,7 +238,7 @@ services:
       - grafana-data:/var/lib/grafana
     environment:
       - TZ=UTC
-      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER}
+      - GF_SECURITY_ADMIN_USER=${USERNAME}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
     deploy:
       update_config:
