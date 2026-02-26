@@ -76,6 +76,10 @@ nu31.space {
         reverse_proxy * nu31space_app:3000
 }
 
+prismo.nu31.space {
+        reverse_proxy * prismo-web-flasher_app:80
+}
+
 compass.nu31.space {
         reverse_proxy * mongo-nu31-viewer:8080
 }
