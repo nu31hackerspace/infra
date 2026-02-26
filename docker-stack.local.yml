@@ -45,7 +45,7 @@ services:
     links:
       - mongo-rs-1
     environment:
-      - CW_MONGO_URI=${MONGO_RS_URI}
+      - CW_MONGO_URI=mongodb://${USERNAME}:${PASSWORD}@mongo-rs-1:27017/?replicaSet=rs0&authSource=admin
       - CW_BASIC_AUTH_USERNAME=${USERNAME}
       - CW_BASIC_AUTH_PASSWORD=${PASSWORD}
     networks:
