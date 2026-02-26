@@ -60,9 +60,9 @@ const main = async () => {
     const env = {
         ...process.env,
         USERNAME: username,
+        PASSWORD: password,
         MONGO_RS_ROOT_USERNAME: username,
         MONGO_RS_ROOT_PASSWORD: password,
-        MONGO_VIEWER_PASS: password,
         MONGO_RS_KEYFILE_CONTENT: keyContent,
         MONGO_RS_URI: mongoRsUri
     };

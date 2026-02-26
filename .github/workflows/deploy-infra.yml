@@ -13,6 +13,7 @@ env:
   ROOT_SSH_PRIVATE_KEY: ${{ secrets.ROOT_SSH_PRIVATE_KEY }}
   ADMIN_USER: ${{ vars.ADMIN_USER }}
   USERNAME: ${{ vars.USERNAME }}
+  PASSWORD: ${{ secrets.PASSWORD }}
 
 jobs:
   build-and-push:
@@ -77,7 +78,7 @@ jobs:
               echo "GIT_COMMIT_SHA=${{ github.sha }}"
               echo "MONGO_URI=${{ secrets.MONGO_URI }}"
               echo "USERNAME=${{ env.USERNAME }}"
-              echo "MONGO_VIEWER_PASS=${{ secrets.MONGO_VIEWER_PASS }}"
+              echo "PASSWORD=${{ env.PASSWORD }}"
               echo "MONGO_ROOT_USERNAME=${{ vars.MONGO_ROOT_USERNAME }}"
               echo "MONGO_ROOT_PASSWORD=${{ secrets.MONGO_ROOT_PASSWORD }}"
               echo "S3_SECRET_ACCESS_KEY=${{ secrets.S3_SECRET_ACCESS_KEY }}"
@@ -87,7 +88,6 @@ jobs:
               echo "MONGO_RS_ROOT_PASSWORD=${{ secrets.MONGO_RS_ROOT_PASSWORD }}"
               echo "MONGO_RS_URI=${{ secrets.MONGO_RS_URI }}"
               echo "MONGO_RS_KEYFILE_CONTENT=${{ secrets.MONGO_RS_KEYFILE_CONTENT }}"
-              echo "GRAFANA_PASSWORD=${{ secrets.GRAFANA_PASSWORD }}"
               echo "OWNER_NAME=${{ env.OWNER_NAME }}"
               echo "MONGO_NU_31_URI=${{ secrets.MONGO_NU_31_URI }}"
               echo "MONGO_NU31_VIEWER_USER=${{ vars.MONGO_NU31_VIEWER_USER }}"

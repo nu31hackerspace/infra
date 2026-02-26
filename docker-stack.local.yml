@@ -47,7 +47,7 @@ services:
     environment:
       - CW_MONGO_URI=${MONGO_RS_URI}
       - CW_BASIC_AUTH_USERNAME=${USERNAME}
-      - CW_BASIC_AUTH_PASSWORD=${MONGO_VIEWER_PASS}
+      - CW_BASIC_AUTH_PASSWORD=${PASSWORD}
     networks:
       - mongo-rs-net
     deploy:
