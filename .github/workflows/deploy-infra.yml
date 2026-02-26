@@ -80,7 +80,6 @@ jobs:
               echo "USERNAME=${{ env.USERNAME }}"
               echo "PASSWORD=${{ env.PASSWORD }}"
               echo "MONGO_ROOT_USERNAME=${{ vars.MONGO_ROOT_USERNAME }}"
-              echo "MONGO_ROOT_PASSWORD=${{ secrets.MONGO_ROOT_PASSWORD }}"
               echo "S3_SECRET_ACCESS_KEY=${{ secrets.S3_SECRET_ACCESS_KEY }}"
               echo "S3_ACCESS_KEY_ID=${{ vars.S3_ACCESS_KEY_ID }}"
               echo "S3_ENDPOINT=${{ vars.S3_ENDPOINT }}"
