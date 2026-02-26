@@ -12,7 +12,7 @@ env:
   OWNER_NAME: vovastelmashchuk
   ROOT_SSH_PRIVATE_KEY: ${{ secrets.ROOT_SSH_PRIVATE_KEY }}
   ADMIN_USER: ${{ vars.ADMIN_USER }}
-  DEPLOY_USER: ${{ vars.USERNAME }}
+  USERNAME: ${{ vars.USERNAME }}
 
 jobs:
   build-and-push:
@@ -76,7 +76,7 @@ jobs:
             {
               echo "GIT_COMMIT_SHA=${{ github.sha }}"
               echo "MONGO_URI=${{ secrets.MONGO_URI }}"
-              echo "MONGO_VIEWER_USER=${{ vars.ADMIN_USER }}"
+              echo "USERNAME=${{ env.USERNAME }}"
               echo "MONGO_VIEWER_PASS=${{ secrets.MONGO_VIEWER_PASS }}"
               echo "MONGO_ROOT_USERNAME=${{ vars.MONGO_ROOT_USERNAME }}"
               echo "MONGO_ROOT_PASSWORD=${{ secrets.MONGO_ROOT_PASSWORD }}"
@@ -101,6 +101,6 @@ jobs:
           name: ${{ env.DOCKER_STACK_NAME }}
           file: docker-stack.yml
           host: ${{ env.HOST }}
-          user: ${{ env.DEPLOY_USER }}
+          user: ${{ env.USERNAME }}
           ssh_key: ${{ env.ROOT_SSH_PRIVATE_KEY }}
           env_file: ./envfile

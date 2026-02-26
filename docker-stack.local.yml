@@ -46,7 +46,7 @@ services:
       - mongo-rs-1
     environment:
       - CW_MONGO_URI=${MONGO_RS_URI}
-      - CW_BASIC_AUTH_USERNAME=${MONGO_VIEWER_USER}
+      - CW_BASIC_AUTH_USERNAME=${USERNAME}
       - CW_BASIC_AUTH_PASSWORD=${MONGO_VIEWER_PASS}
     networks:
       - mongo-rs-net

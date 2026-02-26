@@ -143,7 +143,7 @@ node local_deploy.js
 ```
 
 Once deployed, you can access the MongoDB viewer at `http://<colima_ip>:5000`.
-Credentials for the viewer can be set in your environment variables (`MONGO_VIEWER_USER`, `MONGO_VIEWER_PASS`) or will default if not specified in the stack file (check `docker-stack.local.yml` for variable usage).
+Credentials for the viewer can be set in your environment variables (`USERNAME`, `MONGO_VIEWER_PASS`) or will default if not specified in the stack file (check `docker-stack.local.yml` for variable usage).
 
 
 ### Grafana backup restore
