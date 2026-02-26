@@ -11,7 +11,6 @@ env:
   HOST: ${{ vars.HOST }}
   OWNER_NAME: vovastelmashchuk
   ROOT_SSH_PRIVATE_KEY: ${{ secrets.ROOT_SSH_PRIVATE_KEY }}
-  ADMIN_USER: ${{ vars.ADMIN_USER }}
   USERNAME: ${{ vars.USERNAME }}
   PASSWORD: ${{ secrets.PASSWORD }}
 
