@@ -12,7 +12,7 @@ env:
   OWNER_NAME: vovastelmashchuk
   ROOT_SSH_PRIVATE_KEY: ${{ secrets.ROOT_SSH_PRIVATE_KEY }}
   ADMIN_USER: ${{ vars.ADMIN_USER }}
-  DEPLOY_USER: root
+  DEPLOY_USER: ${{ vars.USERNAME }}
 
 jobs:
   build-and-push:
