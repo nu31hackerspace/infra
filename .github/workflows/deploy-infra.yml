@@ -12,6 +12,7 @@ env:
   OWNER_NAME: vovastelmashchuk
   ROOT_SSH_PRIVATE_KEY: ${{ secrets.ROOT_SSH_PRIVATE_KEY }}
   ADMIN_USER: ${{ vars.ADMIN_USER }}
+  DEPLOY_USER: root
 
 jobs:
   build-and-push:
@@ -100,6 +101,6 @@ jobs:
           name: ${{ env.DOCKER_STACK_NAME }}
           file: docker-stack.yml
           host: ${{ env.HOST }}
-          user: deploy
+          user: ${{ env.DEPLOY_USER }}
           ssh_key: ${{ env.ROOT_SSH_PRIVATE_KEY }}
           env_file: ./envfile
