@@ -79,7 +79,6 @@ jobs:
               echo "MONGO_URI=${{ secrets.MONGO_URI }}"
               echo "USERNAME=${{ env.USERNAME }}"
               echo "PASSWORD=${{ env.PASSWORD }}"
-              echo "MONGO_ROOT_USERNAME=${{ vars.MONGO_ROOT_USERNAME }}"
               echo "S3_SECRET_ACCESS_KEY=${{ secrets.S3_SECRET_ACCESS_KEY }}"
               echo "S3_ACCESS_KEY_ID=${{ vars.S3_ACCESS_KEY_ID }}"
               echo "S3_ENDPOINT=${{ vars.S3_ENDPOINT }}"
