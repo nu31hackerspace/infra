@@ -81,14 +81,14 @@ jobs:
       - name: Create env file
         run: |
             {
-              echo "OWNER_NAME=${{ env.OWNER_NAME }}"
-              echo "GIT_COMMIT_SHA=${{ env.GIT_COMMIT_SHA }}"
-              echo "USERNAME=${{ env.USERNAME }}"
-              echo "PASSWORD=${{ env.PASSWORD }}"
-              echo "MONGO_RS_KEYFILE_CONTENT=${{ env.MONGO_RS_KEYFILE_CONTENT }}"
-              echo "S3_SECRET_ACCESS_KEY=${{ env.S3_SECRET_ACCESS_KEY }}"
-              echo "S3_ACCESS_KEY_ID=${{ env.S3_ACCESS_KEY_ID }}"
-              echo "S3_ENDPOINT=${{ env.S3_ENDPOINT }}"
+              echo "OWNER_NAME='${{ env.OWNER_NAME }}'"
+              echo "GIT_COMMIT_SHA='${{ env.GIT_COMMIT_SHA }}'"
+              echo "USERNAME='${{ env.USERNAME }}'"
+              echo "PASSWORD='${{ env.PASSWORD }}'"
+              echo "MONGO_RS_KEYFILE_CONTENT='${{ env.MONGO_RS_KEYFILE_CONTENT }}'"
+              echo "S3_SECRET_ACCESS_KEY='${{ env.S3_SECRET_ACCESS_KEY }}'"
+              echo "S3_ACCESS_KEY_ID='${{ env.S3_ACCESS_KEY_ID }}'"
+              echo "S3_ENDPOINT='${{ env.S3_ENDPOINT }}'"
             } > ./envfile
 
       - name: Docker Stack Deploy
