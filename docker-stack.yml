@@ -161,7 +161,7 @@ services:
       - S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
       - S3_FOLDER=caddy-daliy
     volumes:
-      - /caddy_storage:/caddy_storage
+      - caddy-data:/caddy_storage
     deploy:
       mode: replicated
       replicas: 0
@@ -183,7 +183,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - /caddy_storage:/caddy_storage
+      - caddy-data:/caddy_storage
     environment:
       - TZ=UTC
     deploy:
@@ -275,3 +275,4 @@ networks:
 volumes:
   mongodb-rs-1-data:
   grafana-data:
+  caddy-data:
