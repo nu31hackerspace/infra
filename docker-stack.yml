@@ -207,7 +207,7 @@ services:
       - TZ=UTC
       - GF_SECURITY_ADMIN_USER=${USERNAME}
       - GF_SECURITY_ADMIN_PASSWORD=${PASSWORD}
-      - GF_SERVER_ROOT_URL=https://${GRAFANA_HOST}
+      - GF_SERVER_ROOT_URL=https://grafana.nu31.space
     deploy:
       update_config:
         order: start-first
