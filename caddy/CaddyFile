@@ -13,67 +13,16 @@
 	}
 }
 
-dozzle.stelmashchuk.dev {
-        reverse_proxy * infra_dozzle:8080
-}
-
-compass.stelmashchuk.dev {
-        reverse_proxy * infra_mongo-rs-viewer:8080
-}
-
-mixdrinks.org {
-        reverse_proxy * mixdrinks_app:3000
-}
-
-www.mixdrinks.org {
-        redir https://mixdrinks.org{uri}
-}
-
-ypod.stelmashchuk.dev {
-        reverse_proxy * ypod_app:3000 {
-                header_up X-Real-IP {remote_host}
-        }
-}
-
-hardandsoft.stelmashchuk.dev {
-        rewrite /files/rss.xml /api/podcast/android-story/rss.xml
-        rewrite /rss.xml /api/podcast/android-story/rss.xml
-
-        reverse_proxy * ypod_app:3000 {
-                header_up Host "hardandsoft.stelmashchuk.dev"
-                header_up X-Real-IP {remote_host}
-        }
-}
-
-podcast.stelmashchuk.dev {
-        reverse_proxy * ypod_app:3000 {
-                header_up Host "podcast.stelmashchuk.dev"
-                header_up X-Real-IP {remote_host}
-        }
-}
-
-nest2d.stelmashchuk.dev {
-        reverse_proxy * nest2d_app:3000
-}
-
-kickstart.stelmashchuk.dev {
-        reverse_proxy * kickstart_app:3000 {
-                header_up X-Real-IP {remote_host}
-        }
-}
-
-velonuxt.stelmashchuk.dev {
-        reverse_proxy * velonuxt_app:3000 {
-                header_up X-Real-IP {remote_host}
-        }
-}
-
-grafana.stelmashchuk.dev {
-        reverse_proxy * infra_grafana:3000
+maintenance.nu31.space {
+	import maintenance
 }
 
 nu31.space {
         reverse_proxy * nu31space_app:3000
+}
+
+grafana.nu31.space {
+        reverse_proxy * infra_grafana:3000
 }
 
 prismo.nu31.space {
@@ -81,12 +30,6 @@ prismo.nu31.space {
 }
 
 compass.nu31.space {
-        reverse_proxy * mongo-nu31-viewer:8080
+        reverse_proxy * infra_mongo-rs-viewer:8080
 }
 
-maintenance.stelmashchuk.dev {
-        basic_auth {
-		Bob $2a$14$Zkx19XLiW6VYouLHR5NmfOFU0z2GTNmpkT/5qqR7hx4IjWJPDhjvG
-	}
-	import maintenance
-}
