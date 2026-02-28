@@ -41,6 +41,8 @@ services:
 
   mongo-rs-init:
     image: mongo:8.2.3
+    links:
+      - mongo-rs-1
     command:
       - bash
       - -c
