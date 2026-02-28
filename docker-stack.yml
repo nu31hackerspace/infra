@@ -210,6 +210,7 @@ services:
       - GF_SERVER_ROOT_URL=https://grafana.nu31.space
       - GF_AUTH_GITHUB_API_URL=https://api.github.com/user
       - GF_AUTH_GITHUB_ALLOWED_ORGANIZATIONS=["nu31hackerspace"]
+      - GF_USERS_AUTO_ASSIGN_ORG_ROLE=Editor
     deploy:
       update_config:
         order: start-first
