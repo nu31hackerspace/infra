@@ -188,7 +188,7 @@ services:
       - caddy-data:/caddy_storage
     environment:
       - TZ=UTC
-      - GRAFANA_URL=${GRAFANA_URL}
+      - GRAFANA_HOST=${GRAFANA_HOST}
     deploy:
       update_config:
         order: start-first
@@ -207,7 +207,7 @@ services:
       - TZ=UTC
       - GF_SECURITY_ADMIN_USER=${USERNAME}
       - GF_SECURITY_ADMIN_PASSWORD=${PASSWORD}
-      - GF_SERVER_ROOT_URL=${GRAFANA_URL}
+      - GF_SERVER_ROOT_URL=https://${GRAFANA_HOST}
     deploy:
       update_config:
         order: start-first

@@ -21,7 +21,7 @@ nu31.space {
         reverse_proxy * nu31space_app:3000
 }
 
-{env.GRAFANA_URL} {
+{env.GRAFANA_HOST} {
         reverse_proxy * infra_grafana:3000
 }
 
