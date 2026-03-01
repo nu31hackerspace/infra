@@ -17,6 +17,7 @@ env:
   ROOT_SSH_PRIVATE_KEY: ${{ secrets.ROOT_SSH_PRIVATE_KEY }}
   MONGO_RS_KEYFILE_CONTENT: ${{ secrets.MONGO_RS_KEYFILE_CONTENT }}
 
+  S3_BUCKET_NAME: nu31-backup
   S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
   S3_ACCESS_KEY_ID: ${{ vars.S3_ACCESS_KEY_ID }}
   S3_ENDPOINT: ${{ vars.S3_ENDPOINT }}
@@ -90,6 +91,7 @@ jobs:
             write_var S3_SECRET_ACCESS_KEY
             write_var S3_ACCESS_KEY_ID
             write_var S3_ENDPOINT
+            write_var S3_BUCKET_NAME
 
       - name: Docker Stack Deploy
         uses: cssnr/stack-deploy-action@v1
