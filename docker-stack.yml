@@ -163,9 +163,11 @@ services:
         condition: on-failure
 
   postgres-viewer:
-    image: sosedoff/pgweb:0.16.2
+    image: dpage/pgadmin4:latest
     environment:
-      - PGWEB_DATABASE_URL=postgres://${USERNAME}:${PASSWORD}@postgres-1:5432/?sslmode=disable
+      - PGADMIN_DEFAULT_EMAIL=${USERNAME}@nu31.space
+      - PGADMIN_DEFAULT_PASSWORD=${PASSWORD}
+      - PGADMIN_LISTEN_PORT=80
     networks:
       - postgres-net
       - reverse-proxy
