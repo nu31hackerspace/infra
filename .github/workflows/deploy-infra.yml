@@ -45,6 +45,9 @@ jobs:
           - name: telegraf
             context: ./telegraf
             image: telegraf
+          - name: postgres-backup
+            context: ./postgres-backup
+            image: postgres-backup
     
     runs-on: ubuntu-latest
     permissions:
