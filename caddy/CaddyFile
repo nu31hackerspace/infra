@@ -33,3 +33,7 @@ compass.nu31.space {
         reverse_proxy * infra_mongo-rs-viewer:8080
 }
 
+pgadmin.nu31.space {
+        reverse_proxy * infra_postgres-viewer:80
+}
+

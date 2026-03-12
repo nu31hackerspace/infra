@@ -21,6 +21,7 @@ env:
   S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
   S3_ACCESS_KEY_ID: ${{ vars.S3_ACCESS_KEY_ID }}
   S3_ENDPOINT: ${{ vars.S3_ENDPOINT }}
+  EMAIL: ${{ vars.EMAIL }}
 
 jobs:
   build-and-push:
@@ -45,6 +46,9 @@ jobs:
           - name: telegraf
             context: ./telegraf
             image: telegraf
+          - name: postgres-backup
+            context: ./postgres-backup
+            image: postgres-backup
     
     runs-on: ubuntu-latest
     permissions:
@@ -92,6 +96,7 @@ jobs:
             write_var S3_SECRET_ACCESS_KEY
             write_var S3_ACCESS_KEY_ID
             write_var S3_ENDPOINT
+            write_var EMAIL
 
       - name: Docker Stack Deploy
         uses: cssnr/stack-deploy-action@v1

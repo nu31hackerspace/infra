@@ -54,8 +54,41 @@ services:
       restart_policy:
         condition: on-failure
 
+  postgres:
+    image: postgres:17
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${USERNAME}
+      - POSTGRES_PASSWORD=${PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - postgres-net
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  postgres-viewer:
+    image: dpage/pgadmin4:9
+    ports:
+      - "5050:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=root@local.dev
+      - PGADMIN_DEFAULT_PASSWORD=${PASSWORD}
+    networks:
+      - postgres-net
+    deploy:
+      restart_policy:
+        condition: on-failure
+
 networks:
   mongo-rs-net:
+    driver: overlay
+    attachable: true
+    driver_opts:
+      encrypted: "true"
+  postgres-net:
     driver: overlay
     attachable: true
     driver_opts:
@@ -63,3 +96,4 @@ networks:
 
 volumes:
   mongodb-rs-1-data:
+  postgres-data:

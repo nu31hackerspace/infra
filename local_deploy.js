@@ -60,6 +60,7 @@ const main = async () => {
         USERNAME: username,
         PASSWORD: password,
         MONGO_RS_KEYFILE_CONTENT: keyContent,
+        EMAIL: 'root@local.dev',
     };
 
     console.log("\nDeploying stack...");
@@ -75,6 +76,7 @@ const main = async () => {
         if (code === 0) {
             console.log("\nDeployment successful!");
             console.log(`Mongo Viewer available at: http://<docker vm ip>:5000`);
+            console.log(`pgAdmin available at: http://<docker vm ip>:5050`);
         } else {
             console.error(`\nDeployment failed with code ${code}`);
             process.exit(code);
