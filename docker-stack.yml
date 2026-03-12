@@ -158,6 +158,12 @@ services:
       - postgres-1-data:/var/lib/postgresql/data
     networks:
       - postgres-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${USERNAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     deploy:
       restart_policy:
         condition: on-failure
@@ -172,6 +178,7 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
+        delay: 5s
 
   postgres-backup-hourly:
     image: ghcr.io/${OWNER_NAME}/postgres-backup:${GIT_COMMIT_SHA}
