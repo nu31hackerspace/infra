@@ -76,7 +76,7 @@ const main = async () => {
             console.log("\nDeployment successful!");
             console.log(`Mongo Viewer available at: http://<docker vm ip>:5000`);
             console.log(`Postgres available at: localhost:5432`);
-            console.log(`Postgres Viewer available at: http://<docker vm ip>:5001`);
+            console.log(`pgAdmin available at: http://<docker vm ip>:5001`);
         } else {
             console.error(`\nDeployment failed with code ${code}`);
             process.exit(code);
