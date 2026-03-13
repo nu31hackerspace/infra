@@ -168,3 +168,4 @@ docker run --rm \
 ```
 
 To create own infrastructure setup, fork the repository and update all need github action secrets and variables.
+
