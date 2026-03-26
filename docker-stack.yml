@@ -318,6 +318,7 @@ services:
     image: ghcr.io/${OWNER_NAME}/grafana:${GIT_COMMIT_SHA}
     links:
       - mongo-rs-1
+      - postgres-1
     volumes:
       - grafana-data:/var/lib/grafana
     environment:
@@ -336,6 +337,7 @@ services:
     networks:
       - reverse-proxy
       - mongo-rs-net
+      - postgres-net
 
   grafana-backup-daily:
     image: ghcr.io/${OWNER_NAME}/grafana-backup:${GIT_COMMIT_SHA}
