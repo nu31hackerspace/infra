@@ -53,7 +53,10 @@ jobs:
           - name: mqtt
             context: ./mqtt
             image: mqtt
-
+          - name: mqtt-backup
+            context: ./mqtt-backup
+            image: mqtt-backup
+    
     runs-on: ubuntu-latest
     permissions:
       contents: read
