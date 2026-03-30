@@ -26,7 +26,12 @@ services:
 
   mongo-rs-1:
     image: mongo:8.2.3
-    command: ["bash", "-c", "echo $MONGO_RS_KEYFILE_CONTENT > /data/keyfile && chmod 400 /data/keyfile && chown 999:999 /data/keyfile && docker-entrypoint.sh mongod --replSet rs0 --keyFile /data/keyfile --bind_ip_all"]
+    command:
+      [
+        "bash",
+        "-c",
+        "echo $MONGO_RS_KEYFILE_CONTENT > /data/keyfile && chmod 400 /data/keyfile && chown 999:999 /data/keyfile && docker-entrypoint.sh mongod --replSet rs0 --keyFile /data/keyfile --bind_ip_all",
+      ]
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${PASSWORD}
@@ -387,10 +392,8 @@ services:
   mqtt:
     image: ghcr.io/${OWNER_NAME}/mqtt:${GIT_COMMIT_SHA}
     ports:
-      # Port 1883 is intentionally not published externally — plain MQTT is only
-      # accessible inside mqtt-net. IoT devices connect via MQTTS on port 8883.
-      - target: ${MQTT_TLS_PORT}
-        published: ${MQTT_TLS_PORT}
+      - target: 8883
+        published: 8883
         protocol: tcp
         mode: ingress
     volumes:
@@ -400,15 +403,11 @@ services:
       # Caddy provisions and renews for MQTT_TLS_DOMAIN.
       - caddy-data:/caddy_storage:ro
     environment:
-      - MQTT_PORT=${MQTT_PORT}
-      - MQTT_TLS_PORT=${MQTT_TLS_PORT}
+      - MQTT_PORT=1883
+      - MQTT_TLS_PORT=8883
       - MQTT_TLS_DOMAIN=${MQTT_TLS_DOMAIN}
       - MQTT_ADMIN_USER=${USERNAME}
       - MQTT_ADMIN_PASSWORD=${PASSWORD}
-    # mqtt-net: dedicated encrypted overlay for internal service-to-service access.
-    # nu31space_app (admin panel) joins this network as external to manage devices
-    # via the dynsec API at infra_mqtt:1883. IoT devices connect from outside via
-    # MQTTS on the ingress-mode published port.
     networks:
       - mqtt-net
     deploy:
