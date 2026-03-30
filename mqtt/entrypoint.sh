@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/sh
+set -eu
 
 : "${MQTT_ADMIN_USER:?need to set MQTT_ADMIN_USER}"
 : "${MQTT_ADMIN_PASSWORD:?need to set MQTT_ADMIN_PASSWORD}"
@@ -43,13 +43,23 @@ if [ -n "${MQTT_TLS_DOMAIN:-}" ]; then
     done
     echo "[entrypoint] TLS certificate found."
 
+    # Copy certs to a mosquitto-readable location — the caddy-data volume is
+    # mounted read-only and Caddy owns the files (root:root 0600), so mosquitto
+    # cannot read them directly.
+    LOCAL_CERT_DIR="/mosquitto/data/tls"
+    mkdir -p "${LOCAL_CERT_DIR}"
+    cp "${CERT_FILE}" "${LOCAL_CERT_DIR}/server.crt"
+    cp "${KEY_FILE}"  "${LOCAL_CERT_DIR}/server.key"
+    chown mosquitto:mosquitto "${LOCAL_CERT_DIR}/server.crt" "${LOCAL_CERT_DIR}/server.key"
+    chmod 0640 "${LOCAL_CERT_DIR}/server.crt" "${LOCAL_CERT_DIR}/server.key"
+
     cat >> "${CONF_FILE}" <<EOF
 
 listener ${MQTT_TLS_PORT}
 allow_anonymous false
 cafile /etc/ssl/certs/ca-certificates.crt
-certfile ${CERT_FILE}
-keyfile ${KEY_FILE}
+certfile ${LOCAL_CERT_DIR}/server.crt
+keyfile ${LOCAL_CERT_DIR}/server.key
 EOF
 fi
 
@@ -57,9 +67,13 @@ fi
 if [ ! -f "${DYNSEC_FILE}" ]; then
     echo "[entrypoint] Initialising dynamic security plugin..."
     mosquitto_ctrl dynsec init "${DYNSEC_FILE}" "${MQTT_ADMIN_USER}" "${MQTT_ADMIN_PASSWORD}"
+    chown mosquitto:mosquitto "${DYNSEC_FILE}"
+    chmod 0640 "${DYNSEC_FILE}"
     echo "[entrypoint] Dynamic security initialised with admin user '${MQTT_ADMIN_USER}'."
 else
     echo "[entrypoint] Dynamic security file already exists, skipping init."
+    chown mosquitto:mosquitto "${DYNSEC_FILE}"
+    chmod 0640 "${DYNSEC_FILE}"
 fi
 
 exec /usr/sbin/mosquitto -c "${CONF_FILE}"

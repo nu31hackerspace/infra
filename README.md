@@ -169,3 +169,10 @@ docker run --rm \
 
 To create own infrastructure setup, fork the repository and update all need github action secrets and variables.
 
+## MQTT
+
+# Read (subscribe, streams messages until Ctrl+C)
+node mqtt.js --mode=read --topic=my/topic
+
+# Write (publish one message and exit)
+node mqtt.js --mode=write --topic=my/topic --message="hello world"
