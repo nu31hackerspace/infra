@@ -387,21 +387,28 @@ services:
   mqtt:
     image: ghcr.io/${OWNER_NAME}/mqtt:${GIT_COMMIT_SHA}
     ports:
-      - target: ${MQTT_PORT}
-        published: ${MQTT_PORT}
+      # Port 1883 is intentionally not published externally — plain MQTT is only
+      # accessible inside mqtt-net. IoT devices connect via MQTTS on port 8883.
+      - target: ${MQTT_TLS_PORT}
+        published: ${MQTT_TLS_PORT}
         protocol: tcp
         mode: ingress
     volumes:
       - mqtt-data:/mosquitto/data
       - mqtt-log:/mosquitto/log
+      # caddy-data mounted read-only so the entrypoint can read the TLS cert that
+      # Caddy provisions and renews for MQTT_TLS_DOMAIN.
+      - caddy-data:/caddy_storage:ro
     environment:
       - MQTT_PORT=${MQTT_PORT}
+      - MQTT_TLS_PORT=${MQTT_TLS_PORT}
+      - MQTT_TLS_DOMAIN=${MQTT_TLS_DOMAIN}
       - MQTT_ADMIN_USER=${USERNAME}
       - MQTT_ADMIN_PASSWORD=${PASSWORD}
     # mqtt-net: dedicated encrypted overlay for internal service-to-service access.
     # nu31space_app (admin panel) joins this network as external to manage devices
     # via the dynsec API at infra_mqtt:1883. IoT devices connect from outside via
-    # the ingress-mode published port.
+    # MQTTS on the ingress-mode published port.
     networks:
       - mqtt-net
     deploy:

@@ -99,6 +99,8 @@ jobs:
             write_var S3_ACCESS_KEY_ID
             write_var S3_ENDPOINT
             write_var MQTT_PORT
+            write_var MQTT_TLS_PORT
+            write_var MQTT_TLS_DOMAIN
 
       - name: Docker Stack Deploy
         uses: cssnr/stack-deploy-action@v1

@@ -37,3 +37,10 @@ pgweb.nu31.space {
         reverse_proxy * infra_postgres-viewer:80
 }
 
+mqtt.nu31.space {
+        # Caddy obtains and renews the TLS cert for this domain.
+        # The cert is read by the MQTT container from the shared caddy-data volume.
+        # MQTT clients connect directly on port 8883 (MQTTS), not through Caddy.
+        respond "MQTT broker — connect on port 8883 via MQTTS" 200
+}
+
