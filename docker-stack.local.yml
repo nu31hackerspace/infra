@@ -90,6 +90,23 @@ services:
         condition: on-failure
         delay: 5s
 
+  mqtt:
+    image: ghcr.io/${OWNER_NAME}/mqtt:latest
+    ports:
+      - "${MQTT_PORT}:${MQTT_PORT}"
+    volumes:
+      - mqtt-data:/mosquitto/data
+      - mqtt-log:/mosquitto/log
+    environment:
+      - MQTT_PORT=${MQTT_PORT}
+      - MQTT_ADMIN_USER=${USERNAME}
+      - MQTT_ADMIN_PASSWORD=${PASSWORD}
+    networks:
+      - mqtt-net
+    deploy:
+      restart_policy:
+        condition: on-failure
+
 networks:
   mongo-rs-net:
     driver: overlay
@@ -101,7 +118,14 @@ networks:
     attachable: true
     driver_opts:
       encrypted: "true"
+  mqtt-net:
+    driver: overlay
+    attachable: true
+    driver_opts:
+      encrypted: "true"
 
 volumes:
   mongodb-rs-1-data:
   postgres-1-data:
+  mqtt-data:
+  mqtt-log:

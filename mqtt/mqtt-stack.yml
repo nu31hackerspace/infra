@@ -1,0 +1,48 @@
+version: "3.8"
+
+services:
+  mqtt:
+    image: ghcr.io/${OWNER_NAME}/mqtt:${GIT_COMMIT_SHA}
+    ports:
+      - target: ${MQTT_PORT}
+        published: ${MQTT_PORT}
+        protocol: tcp
+        mode: ingress
+    volumes:
+      - mqtt-data:/mosquitto/data
+      - mqtt-log:/mosquitto/log
+    environment:
+      - MQTT_PORT=${MQTT_PORT}
+      - MQTT_ADMIN_USER=${USERNAME}
+      - MQTT_ADMIN_PASSWORD=${PASSWORD}
+    # mqtt-net: dedicated encrypted overlay, matching the mongo-rs-net / postgres-net
+    # pattern. nu31space_app (admin panel) joins this network as external to reach the
+    # broker at infra_mqtt:1883 for dynsec management.
+    # IoT devices connect from outside via the ingress-mode published port — no
+    # reverse-proxy attachment needed.
+    networks:
+      - mqtt-net
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      resources:
+        limits:
+          memory: 256M
+
+networks:
+  mqtt-net:
+    driver: overlay
+    attachable: true
+    driver_opts:
+      encrypted: "true"
+
+volumes:
+  mqtt-data:
+  mqtt-log:
