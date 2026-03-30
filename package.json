@@ -1,0 +1,24 @@
+{
+  "name": "infra",
+  "version": "1.0.0",
+  "description": "We build real **uncloud** here.",
+  "main": "local_deploy.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nu31hackerspace/infra.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/nu31hackerspace/infra/issues"
+  },
+  "homepage": "https://github.com/nu31hackerspace/infra#readme",
+  "dependencies": {
+    "mqtt": "^5.15.1"
+  }
+}

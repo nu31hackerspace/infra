@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/sh
+set -eu
 
 : "${MQTT_ADMIN_USER:?need to set MQTT_ADMIN_USER}"
 : "${MQTT_ADMIN_PASSWORD:?need to set MQTT_ADMIN_PASSWORD}"
@@ -57,9 +57,13 @@ fi
 if [ ! -f "${DYNSEC_FILE}" ]; then
     echo "[entrypoint] Initialising dynamic security plugin..."
     mosquitto_ctrl dynsec init "${DYNSEC_FILE}" "${MQTT_ADMIN_USER}" "${MQTT_ADMIN_PASSWORD}"
+    chown mosquitto:mosquitto "${DYNSEC_FILE}"
+    chmod 0640 "${DYNSEC_FILE}"
     echo "[entrypoint] Dynamic security initialised with admin user '${MQTT_ADMIN_USER}'."
 else
     echo "[entrypoint] Dynamic security file already exists, skipping init."
+    chown mosquitto:mosquitto "${DYNSEC_FILE}"
+    chmod 0640 "${DYNSEC_FILE}"
 fi
 
 exec /usr/sbin/mosquitto -c "${CONF_FILE}"
