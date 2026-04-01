@@ -321,11 +321,16 @@ services:
     hostname: "{{.Node.Hostname}}"
     networks:
       - mongo-rs-net
+      - mqtt-net
     environment:
       - HOST_PROC=/host/proc
       - HOST_SYS=/host/sys
       - HOST_ETC=/host/etc
       - MONGO_URL=mongodb://${USERNAME}:${PASSWORD}@mongo-rs-1:27017/?replicaSet=rs0&authSource=admin
+      - MQTT_HOST=mqtt
+      - MQTT_PORT=1883
+      - MQTT_USER=${USERNAME}
+      - MQTT_PASSWORD=${PASSWORD}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /proc:/host/proc
