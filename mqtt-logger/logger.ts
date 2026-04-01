@@ -28,7 +28,7 @@ const CREATE_TABLE_SQL = `
   CREATE TABLE IF NOT EXISTS mqtt_messages (
     id          BIGSERIAL   PRIMARY KEY,
     topic       TEXT        NOT NULL,
-    payload     BYTEA,
+    payload     JSONB,
     qos         SMALLINT    NOT NULL,
     retain      BOOLEAN     NOT NULL,
     received_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -37,7 +37,25 @@ const CREATE_TABLE_SQL = `
     ON mqtt_messages (topic, received_at DESC);
   CREATE INDEX IF NOT EXISTS mqtt_messages_time_idx
     ON mqtt_messages (received_at DESC);
+  CREATE INDEX IF NOT EXISTS mqtt_messages_payload_idx
+    ON mqtt_messages USING gin (payload);
 `;
+
+/** Convert a raw MQTT payload buffer to a JSONB-compatible string.
+ *  - Valid JSON            → stored as-is          e.g. {"temp":23.5}
+ *  - Plain text / number  → wrapped as JSON string  e.g. "on"
+ *  - Empty / binary       → null
+ */
+function toJsonb(buf: Buffer): string | null {
+  const str = buf.toString("utf8").trim();
+  if (!str) return null;
+  try {
+    JSON.parse(str);
+    return str;             // already valid JSON
+  } catch {
+    return JSON.stringify(str); // wrap plain text as a JSON string value
+  }
+}
 
 async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -73,8 +91,8 @@ function startMqtt(): void {
   client.on("message", (topic, payload, packet) => {
     pool
       .query(
-        "INSERT INTO mqtt_messages (topic, payload, qos, retain) VALUES ($1, $2, $3, $4)",
-        [topic, payload, packet.qos, packet.retain],
+        "INSERT INTO mqtt_messages (topic, payload, qos, retain) VALUES ($1, $2::jsonb, $3, $4)",
+        [topic, toJsonb(payload), packet.qos, packet.retain],
       )
       .catch((err: Error) =>
         console.error(`[mqtt] Failed to store '${topic}': ${err.message}`),
