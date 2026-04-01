@@ -33,6 +33,10 @@ const CREATE_TABLE_SQL = `
     retain      BOOLEAN     NOT NULL,
     received_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
+  CREATE INDEX IF NOT EXISTS mqtt_messages_topic_time_idx
+    ON mqtt_messages (topic, received_at DESC);
+  CREATE INDEX IF NOT EXISTS mqtt_messages_time_idx
+    ON mqtt_messages (received_at DESC);
 `;
 
 async function sleep(ms: number): Promise<void> {
