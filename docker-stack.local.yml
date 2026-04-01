@@ -112,6 +112,25 @@ services:
       restart_policy:
         condition: on-failure
 
+  mqtt-logger:
+    image: infra_mqtt-logger:local
+    environment:
+      - MQTT_HOST=mqtt
+      - MQTT_PORT=1883
+      - MQTT_USER=${USERNAME}
+      - MQTT_PASSWORD=${PASSWORD}
+      - PGHOST=postgres-1
+      - PGPORT=5432
+      - PGUSER=${USERNAME}
+      - PGPASSWORD=${PASSWORD}
+      - PGDATABASE=mqtt_store
+    networks:
+      - mqtt-net
+      - postgres-net
+    deploy:
+      restart_policy:
+        condition: on-failure
+
 networks:
   mongo-rs-net:
     driver: overlay
