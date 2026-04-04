@@ -34,7 +34,7 @@ compass.nu31.space {
 }
 
 pgweb.nu31.space {
-        reverse_proxy * infra_postgres-viewer:80
+        reverse_proxy * infra_pgweb-oauth-proxy:4180
 }
 
 mqtt.nu31.space {
