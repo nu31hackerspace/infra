@@ -165,7 +165,7 @@ services:
     command:
       - --provider=github
       - --github-org=nu31hackerspace
-      - --upstream=http://infra_postgres-viewer:80/
+      - --upstream=http://postgres-viewer:80/
       - --http-address=0.0.0.0:4180
       - --redirect-url=https://pgweb.nu31.space/oauth2/callback
       - --email-domain=*
