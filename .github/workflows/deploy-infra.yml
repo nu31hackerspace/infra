@@ -16,6 +16,10 @@ env:
 
   MQTT_TLS_DOMAIN: mqtt.nu31.space
 
+  PGWEB_GITHUB_CLIENT_ID: ${{ secrets.PGWEB_GITHUB_CLIENT_ID }}
+  PGWEB_GITHUB_CLIENT_SECRET: ${{ secrets.PGWEB_GITHUB_CLIENT_SECRET }}
+  PGWEB_OAUTH2_COOKIE_SECRET: ${{ secrets.PGWEB_OAUTH2_COOKIE_SECRET }}
+
   ROOT_SSH_PRIVATE_KEY: ${{ secrets.ROOT_SSH_PRIVATE_KEY }}
   MONGO_RS_KEYFILE_CONTENT: ${{ secrets.MONGO_RS_KEYFILE_CONTENT }}
 
@@ -107,6 +111,9 @@ jobs:
           write_var S3_ACCESS_KEY_ID
           write_var S3_ENDPOINT
           write_var MQTT_TLS_DOMAIN
+          write_var PGWEB_GITHUB_CLIENT_ID
+          write_var PGWEB_GITHUB_CLIENT_SECRET
+          write_var PGWEB_OAUTH2_COOKIE_SECRET
 
       - name: Docker Stack Deploy
         uses: cssnr/stack-deploy-action@v1
