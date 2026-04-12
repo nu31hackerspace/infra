@@ -134,6 +134,11 @@ services:
     environment:
       - POSTGRES_USER=${USERNAME}
       - POSTGRES_PASSWORD=${PASSWORD}
+    ports:
+      - target: 5432
+        published: 5432
+        protocol: tcp
+        mode: ingress
     volumes:
       - postgres-1-data:/var/lib/postgresql/data
     networks:
