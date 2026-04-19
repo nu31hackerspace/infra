@@ -131,6 +131,8 @@ services:
 
   postgres-1:
     image: postgres:17.4
+    ports:
+      - "5432:5432"
     environment:
       - POSTGRES_USER=${USERNAME}
       - POSTGRES_PASSWORD=${PASSWORD}
