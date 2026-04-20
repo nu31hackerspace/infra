@@ -446,6 +446,25 @@ services:
       restart_policy:
         condition: none
 
+  wikijs:
+    image: ghcr.io/requarks/wiki:2
+    environment:
+      - DB_TYPE=postgres
+      - DB_HOST=postgres-1
+      - DB_PORT=5432
+      - DB_USER=${USERNAME}
+      - DB_PASS=${PASSWORD}
+      - DB_NAME=wikijs
+    networks:
+      - postgres-net
+      - reverse-proxy
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+      update_config:
+        order: start-first
+
 networks:
   reverse-proxy:
     driver: overlay

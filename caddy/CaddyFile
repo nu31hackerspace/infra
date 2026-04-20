@@ -37,6 +37,10 @@ pgweb.nu31.space {
         reverse_proxy * infra_pgweb-oauth-proxy:4180
 }
 
+wiki.nu31.space {
+        reverse_proxy * infra_wikijs:3000
+}
+
 mqtt.nu31.space {
         # Caddy obtains and renews the TLS cert for this domain.
         # The cert is read by the MQTT container from the shared caddy-data volume.
