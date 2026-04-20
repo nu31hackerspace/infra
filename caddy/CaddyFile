@@ -26,7 +26,7 @@ grafana.nu31.space {
 }
 
 prismo.nu31.space {
-        reverse_proxy * prismo-web-flasher_app:3000
+        reverse_proxy * prismo_app:3000
 }
 
 compass.nu31.space {
