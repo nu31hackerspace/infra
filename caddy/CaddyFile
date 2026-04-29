@@ -45,6 +45,33 @@ events.nu31.space {
         reverse_proxy * gancio_app:13120
 }
 
+forum.nu31.space {
+        @lemmy_api path /api/* /pictrs/* /feeds/* /nodeinfo/* /.well-known/*
+        @lemmy_activity header Accept *application/activity+json*
+        @lemmy_ld header Accept *application/ld+json*
+        @lemmy_post method POST
+
+        handle @lemmy_api {
+                reverse_proxy lemmy_lemmy:8536
+        }
+
+        handle @lemmy_activity {
+                reverse_proxy lemmy_lemmy:8536
+        }
+
+        handle @lemmy_ld {
+                reverse_proxy lemmy_lemmy:8536
+        }
+
+        handle @lemmy_post {
+                reverse_proxy lemmy_lemmy:8536
+        }
+
+        handle {
+                reverse_proxy lemmy_lemmy-ui:1234
+        }
+}
+
 mqtt.nu31.space {
         # Caddy obtains and renews the TLS cert for this domain.
         # The cert is read by the MQTT container from the shared caddy-data volume.
