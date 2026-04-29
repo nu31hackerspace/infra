@@ -52,23 +52,23 @@ forum.nu31.space {
         @lemmy_post method POST
 
         handle @lemmy_api {
-                reverse_proxy lemmy_lemmy:8536
+                reverse_proxy 10.10.10.2:8536
         }
 
         handle @lemmy_activity {
-                reverse_proxy lemmy_lemmy:8536
+                reverse_proxy 10.10.10.2:8536
         }
 
         handle @lemmy_ld {
-                reverse_proxy lemmy_lemmy:8536
+                reverse_proxy 10.10.10.2:8536
         }
 
         handle @lemmy_post {
-                reverse_proxy lemmy_lemmy:8536
+                reverse_proxy 10.10.10.2:8536
         }
 
         handle {
-                reverse_proxy lemmy_lemmy-ui:1234
+                reverse_proxy 10.10.10.2:1234
         }
 }
 
