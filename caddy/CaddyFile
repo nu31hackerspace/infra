@@ -52,19 +52,39 @@ forum.nu31.space {
         @lemmy_post method POST
 
         handle @lemmy_api {
-                reverse_proxy 10.10.10.2:8536
+                reverse_proxy 10.10.10.2:8536 {
+                        header_up X-Real-IP {remote_host}
+                        header_up X-Forwarded-For {remote_host}
+                        header_up X-Forwarded-Proto {scheme}
+                        header_up Host {host}
+                }
         }
 
         handle @lemmy_activity {
-                reverse_proxy 10.10.10.2:8536
+                reverse_proxy 10.10.10.2:8536 {
+                        header_up X-Real-IP {remote_host}
+                        header_up X-Forwarded-For {remote_host}
+                        header_up X-Forwarded-Proto {scheme}
+                        header_up Host {host}
+                }
         }
 
         handle @lemmy_ld {
-                reverse_proxy 10.10.10.2:8536
+                reverse_proxy 10.10.10.2:8536 {
+                        header_up X-Real-IP {remote_host}
+                        header_up X-Forwarded-For {remote_host}
+                        header_up X-Forwarded-Proto {scheme}
+                        header_up Host {host}
+                }
         }
 
         handle @lemmy_post {
-                reverse_proxy 10.10.10.2:8536
+                reverse_proxy 10.10.10.2:8536 {
+                        header_up X-Real-IP {remote_host}
+                        header_up X-Forwarded-For {remote_host}
+                        header_up X-Forwarded-Proto {scheme}
+                        header_up Host {host}
+                }
         }
 
         handle {
