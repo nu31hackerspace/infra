@@ -45,7 +45,7 @@ events.nu31.space {
         reverse_proxy * gancio_app:13120
 }
 
-forum.nu31.space {
+lemmy.nu31.space {
         @lemmy_api path /api/* /pictrs/* /feeds/* /nodeinfo/* /.well-known/*
         @lemmy_activity header Accept *application/activity+json*
         @lemmy_ld header Accept *application/ld+json*
@@ -89,6 +89,18 @@ forum.nu31.space {
 
         handle {
                 reverse_proxy 10.10.10.2:1234
+        }
+}
+
+forum.nu31.space {
+        reverse_proxy https://10.10.10.2:443 {
+                transport http {
+                        tls_insecure_skip_verify
+                }
+                header_up X-Real-IP {remote_host}
+                header_up X-Forwarded-For {remote_host}
+                header_up X-Forwarded-Proto {scheme}
+                header_up Host {host}
         }
 }
 
