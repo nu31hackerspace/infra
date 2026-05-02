@@ -92,7 +92,7 @@ lemmy.nu31.space {
         }
 }
 
-forum.nu31.space {
+zulip.nu31.space {
         reverse_proxy https://10.10.10.2:443 {
                 transport http {
                         tls_insecure_skip_verify
