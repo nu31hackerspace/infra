@@ -92,6 +92,10 @@ lemmy.nu31.space {
         }
 }
 
+a.lemmy.nu31.space {
+        reverse_proxy 10.10.10.2:3000
+}
+
 zulip.nu31.space {
         reverse_proxy https://10.10.10.2:443 {
                 transport http {
