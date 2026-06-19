@@ -1,5 +1,8 @@
 ---
 - name: Install Docker on Ubuntu
+  vars:
+    docker_version: "5:29.5.3-1~ubuntu.26.04~resolute"
+
   hosts: all
   become: yes
   tasks:
@@ -43,8 +46,8 @@
     - name: Install Docker CE
       apt:
         name:
-          - docker-ce
-          - docker-ce-cli
+          - "docker-ce={{ docker_version }}"
+          - "docker-ce-cli={{ docker_version }}"
           - containerd.io
           - docker-buildx-plugin
           - docker-compose-plugin
