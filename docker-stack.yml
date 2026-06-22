@@ -268,6 +268,7 @@ services:
       - "8080:8080"
       - "80:80"
       - "443:443"
+      - "8448:8448"
     volumes:
       - caddy-data:/caddy_storage
     environment:
