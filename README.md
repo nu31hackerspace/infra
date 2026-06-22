@@ -43,7 +43,12 @@ The `infra` stack has the cron executor `crazymax/swarm-cronjob` which is used f
 ### Backups
 
 The project provides periodic backups for mongo and caddy config.
-The Database backups each hour, each day, and each week, all backups can be stored in any S3 compatible storage.
+The Database backups each hour, each day, and each week, all backups are stored in a Google Cloud Storage bucket.
+
+Backups authenticate with a Google Cloud service account that has the `Storage Object Admin` role on the bucket. Provide its credentials to the deploy as:
+
+- `vars.GCS_BUCKET` — the destination bucket name (no `gs://` prefix).
+- `secrets.GCS_SA_KEY_BASE64` — the service account JSON key, base64-encoded (e.g. `base64 -w0 key.json`).
 
 ## Build & deploy
 

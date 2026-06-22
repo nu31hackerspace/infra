@@ -2,11 +2,9 @@
 set -euo pipefail
 
 : "${MQTT_DATA_DIR:?need to set MQTT_DATA_DIR}"
-: "${S3_BUCKET:?need to set S3_BUCKET}"
-: "${S3_ACCESS_KEY_ID:?need to set S3_ACCESS_KEY_ID}"
-: "${S3_SECRET_ACCESS_KEY:?need to set S3_SECRET_ACCESS_KEY}"
-: "${S3_FOLDER:?need to set S3_FOLDER}"
-: "${S3_ENDPOINT:?need to set S3_ENDPOINT}"
+: "${GCS_BUCKET:?need to set GCS_BUCKET}"
+: "${GCS_FOLDER:?need to set GCS_FOLDER}"
+: "${GCS_SA_KEY_BASE64:?need to set GCS_SA_KEY_BASE64}"
 
 DYNSEC_FILE="${MQTT_DATA_DIR}/dynsec.json"
 
@@ -22,13 +20,16 @@ echo "Archiving MQTT dynamic security config from ${MQTT_DATA_DIR} → ${ARCHIVE
 
 tar -czf "${ARCHIVE}" -C "$(dirname "${MQTT_DATA_DIR}")" "$(basename "${MQTT_DATA_DIR}")"
 
-UPLOAD_PATH="s3://${S3_BUCKET}/${S3_FOLDER}/mqtt-backup-${TS}.tar.gz"
-echo "Uploading to S3: ${UPLOAD_PATH}"
+# Authenticate to Google Cloud with the service account key (base64-encoded JSON).
+export CLOUDSDK_CONFIG=/tmp/gcloud
+KEY_FILE="$(mktemp)"
+trap 'rm -f "${KEY_FILE}"' EXIT
+echo "${GCS_SA_KEY_BASE64}" | base64 -d > "${KEY_FILE}"
+gcloud auth activate-service-account --key-file="${KEY_FILE}"
 
-export AWS_ACCESS_KEY_ID="$S3_ACCESS_KEY_ID"
-export AWS_SECRET_ACCESS_KEY="$S3_SECRET_ACCESS_KEY"
-
-aws --endpoint-url="$S3_ENDPOINT" s3 cp "$ARCHIVE" "$UPLOAD_PATH"
+UPLOAD_PATH="gs://${GCS_BUCKET}/${GCS_FOLDER}/mqtt-backup-${TS}.tar.gz"
+echo "Uploading to GCS: ${UPLOAD_PATH}"
+gcloud storage cp "${ARCHIVE}" "${UPLOAD_PATH}"
 
 echo "Done."
 

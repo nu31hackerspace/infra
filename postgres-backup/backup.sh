@@ -6,11 +6,9 @@ set -euo pipefail
 : "${PGPORT:?need to set PGPORT}"
 : "${PGUSER:?need to set PGUSER}"
 : "${PGPASSWORD:?need to set PGPASSWORD}"
-: "${S3_BUCKET:?need to set S3_BUCKET}"
-: "${S3_ACCESS_KEY_ID:?need to set S3_ACCESS_KEY_ID}"
-: "${S3_SECRET_ACCESS_KEY:?need to set S3_SECRET_ACCESS_KEY}"
-: "${S3_FOLDER:?need to set S3_FOLDER}"
-: "${S3_ENDPOINT:?need to set S3_ENDPOINT}"
+: "${GCS_BUCKET:?need to set GCS_BUCKET}"
+: "${GCS_FOLDER:?need to set GCS_FOLDER}"
+: "${GCS_SA_KEY_BASE64:?need to set GCS_SA_KEY_BASE64}"
 
 TS="$(date +'%Y-%m-%d_%H-%M')"
 ARCHIVE="/tmp/pgdump-${TS}.sql.gz"
@@ -18,12 +16,15 @@ ARCHIVE="/tmp/pgdump-${TS}.sql.gz"
 echo "[+] Dumping PostgreSQL → ${ARCHIVE}"
 pg_dumpall | gzip > "${ARCHIVE}"
 
-UPLOAD_PATH="s3://${S3_BUCKET}/${S3_FOLDER}/pgdump-${TS}.sql.gz"
-echo "[+] Uploading to S3: ${UPLOAD_PATH}"
+# Authenticate to Google Cloud with the service account key (base64-encoded JSON).
+export CLOUDSDK_CONFIG=/tmp/gcloud
+KEY_FILE="$(mktemp)"
+trap 'rm -f "${KEY_FILE}"' EXIT
+echo "${GCS_SA_KEY_BASE64}" | base64 -d > "${KEY_FILE}"
+gcloud auth activate-service-account --key-file="${KEY_FILE}"
 
-export AWS_ACCESS_KEY_ID="$S3_ACCESS_KEY_ID"
-export AWS_SECRET_ACCESS_KEY="$S3_SECRET_ACCESS_KEY"
-
-aws --endpoint-url="$S3_ENDPOINT" s3 cp "$ARCHIVE" "$UPLOAD_PATH"
+UPLOAD_PATH="gs://${GCS_BUCKET}/${GCS_FOLDER}/pgdump-${TS}.sql.gz"
+echo "[+] Uploading to GCS: ${UPLOAD_PATH}"
+gcloud storage cp "${ARCHIVE}" "${UPLOAD_PATH}"
 
 echo "[+] Done."
