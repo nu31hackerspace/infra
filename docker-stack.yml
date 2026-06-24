@@ -33,6 +33,7 @@ services:
         "echo $MONGO_RS_KEYFILE_CONTENT > /data/keyfile && chmod 400 /data/keyfile && chown 999:999 /data/keyfile && docker-entrypoint.sh mongod --replSet rs0 --keyFile /data/keyfile --bind_ip_all",
       ]
     environment:
+      - GLIBC_TUNABLES="glibc.cpu.hwcaps=-SHSTK"
       - MONGO_INITDB_ROOT_USERNAME=${USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${PASSWORD}
       - MONGO_RS_KEYFILE_CONTENT=${MONGO_RS_KEYFILE_CONTENT}
@@ -46,7 +47,7 @@ services:
 
   mongo-rs-init:
     image: mongo:8.2.3
-    links:
+    depends_on:
       - mongo-rs-1
     command:
       - bash
@@ -68,6 +69,8 @@ services:
 
   mongo-rs-viewer:
     image: haohanyang/compass-web:0.3.1
+    depends_on:
+      - mongo-rs-1
     environment:
       - CW_MONGO_URI=mongodb://${USERNAME}:${PASSWORD}@mongo-rs-1:27017/?replicaSet=rs0&authSource=admin
       - CW_BASIC_AUTH_USERNAME=${USERNAME}
