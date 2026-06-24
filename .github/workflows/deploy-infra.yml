@@ -14,7 +14,7 @@ env:
   USERNAME: ${{ vars.USERNAME }}
   PASSWORD: ${{ secrets.PASSWORD }}
 
-  MQTT_TLS_DOMAIN: mqtt.nu31.space
+  MQTT_TLS_DOMAIN: mqtt.gc.nu31.space
 
   PGWEB_GITHUB_CLIENT_ID: ${{ secrets.PGWEB_GITHUB_CLIENT_ID }}
   PGWEB_GITHUB_CLIENT_SECRET: ${{ secrets.PGWEB_GITHUB_CLIENT_SECRET }}
@@ -91,6 +91,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-push
+    environment: gc
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6

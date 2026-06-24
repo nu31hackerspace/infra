@@ -167,10 +167,10 @@ services:
       - --github-org=nu31hackerspace
       - --upstream=http://postgres-viewer:80/
       - --http-address=0.0.0.0:4180
-      - --redirect-url=https://pgweb.nu31.space/oauth2/callback
+      - --redirect-url=https://pgweb.gc.nu31.space/oauth2/callback
       - --email-domain=*
       - --cookie-secure=true
-      - --cookie-domain=pgweb.nu31.space
+      - --cookie-domain=pgweb.gc.nu31.space
       - --cookie-name=_oauth2_proxy_pgweb
     environment:
       - OAUTH2_PROXY_CLIENT_ID=${PGWEB_GITHUB_CLIENT_ID}
@@ -293,7 +293,7 @@ services:
       - TZ=UTC
       - GF_SECURITY_ADMIN_USER=${USERNAME}
       - GF_SECURITY_ADMIN_PASSWORD=${PASSWORD}
-      - GF_SERVER_ROOT_URL=https://grafana.nu31.space
+      - GF_SERVER_ROOT_URL=https://grafana.gc.nu31.space
       - GF_AUTH_GITHUB_API_URL=https://api.github.com/user
       - GF_AUTH_GITHUB_ALLOWED_ORGANIZATIONS=["nu31hackerspace"]
       - GF_USERS_AUTO_ASSIGN_ORG_ROLE=Editor
