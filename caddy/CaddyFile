@@ -13,7 +13,7 @@
 	}
 }
 
-maintenance.gc.nu31.space {
+maintenance.nu31.space {
 	import maintenance
 }
 
@@ -35,7 +35,7 @@ compass.gc.nu31.space {
         reverse_proxy * infra_mongo-rs-viewer:8080
 }
 
-pgweb.gc.nu31.space {
+pgweb.nu31.space {
         reverse_proxy * infra_pgweb-oauth-proxy:4180
 }
 
@@ -43,7 +43,7 @@ wiki.nu31.space {
         reverse_proxy * infra_wikijs:3000
 }
 
-events.gc.nu31.space {
+events.nu31.space {
         reverse_proxy * gancio_app:13120
 }
 
