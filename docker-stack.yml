@@ -68,7 +68,7 @@ services:
         max_attempts: 5
 
   mongo-rs-viewer:
-    image: haohanyang/compass-web:0.3.1
+    image: haohanyang/compass-web:0.5.0
     depends_on:
       - mongo-rs-1
     environment:
@@ -92,7 +92,7 @@ services:
       - MONGO_URI=mongodb://${USERNAME}:${PASSWORD}@mongo-rs-1:27017/?replicaSet=rs0&authSource=admin
       - GCS_BUCKET=${GCS_BUCKET}
       - GCS_SA_KEY_BASE64=${GCS_SA_KEY_BASE64}
-      - GCS_FOLDER=mongo-rs-daily
+      - GCS_FOLDER=gc-mongo-daily
     networks:
       - mongo-rs-net
     deploy:
@@ -115,7 +115,7 @@ services:
       - MONGO_URI=mongodb://${USERNAME}:${PASSWORD}@mongo-rs-1:27017/?replicaSet=rs0&authSource=admin
       - GCS_BUCKET=${GCS_BUCKET}
       - GCS_SA_KEY_BASE64=${GCS_SA_KEY_BASE64}
-      - GCS_FOLDER=mongo-rs-weekly
+      - GCS_FOLDER=gc-mongo-weekly
     networks:
       - mongo-rs-net
     deploy:
@@ -199,7 +199,7 @@ services:
       - PGPASSWORD=${PASSWORD}
       - GCS_BUCKET=${GCS_BUCKET}
       - GCS_SA_KEY_BASE64=${GCS_SA_KEY_BASE64}
-      - GCS_FOLDER=postgres-daily
+      - GCS_FOLDER=gc-postgres-daily
     networks:
       - postgres-net
     deploy:
@@ -225,7 +225,7 @@ services:
       - PGPASSWORD=${PASSWORD}
       - GCS_BUCKET=${GCS_BUCKET}
       - GCS_SA_KEY_BASE64=${GCS_SA_KEY_BASE64}
-      - GCS_FOLDER=postgres-weekly
+      - GCS_FOLDER=gc-postgres-weekly
     networks:
       - postgres-net
     deploy:
@@ -248,7 +248,7 @@ services:
       - CADDY_DATA_DIR=/caddy_storage
       - GCS_BUCKET=${GCS_BUCKET}
       - GCS_SA_KEY_BASE64=${GCS_SA_KEY_BASE64}
-      - GCS_FOLDER=caddy-daliy
+      - GCS_FOLDER=gc-caddy-daliy
     volumes:
       - caddy-data:/caddy_storage
     deploy:
@@ -320,7 +320,7 @@ services:
       - GRAFANA_DATA_DIR=/var/lib/grafana/grafana.db
       - GCS_BUCKET=${GCS_BUCKET}
       - GCS_SA_KEY_BASE64=${GCS_SA_KEY_BASE64}
-      - GCS_FOLDER=grafana-daily
+      - GCS_FOLDER=gc-grafana-daily
     volumes:
       - grafana-data:/var/lib/grafana
     deploy:
@@ -392,26 +392,6 @@ services:
       resources:
         limits:
           memory: 256M
-
-  mqtt-logger:
-    image: ghcr.io/${OWNER_NAME}/mqtt-logger:${GIT_COMMIT_SHA}
-    environment:
-      - MQTT_HOST=mqtt
-      - MQTT_PORT=1883
-      - MQTT_USER=${USERNAME}
-      - MQTT_PASSWORD=${PASSWORD}
-      - PGHOST=postgres-1
-      - PGPORT=5432
-      - PGUSER=${USERNAME}
-      - PGPASSWORD=${PASSWORD}
-      - PGDATABASE=mqtt_store
-    networks:
-      - mqtt-net
-      - postgres-net
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
 
   mqtt-backup-daily:
     image: ghcr.io/${OWNER_NAME}/mqtt-backup:${GIT_COMMIT_SHA}

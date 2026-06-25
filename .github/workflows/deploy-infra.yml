@@ -59,9 +59,6 @@ jobs:
           - name: mqtt-backup
             context: ./mqtt-backup
             image: mqtt-backup
-          - name: mqtt-logger
-            context: ./mqtt-logger
-            image: mqtt-logger
     
     runs-on: ubuntu-latest
     permissions:
