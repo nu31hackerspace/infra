@@ -403,7 +403,7 @@ services:
       - MQTT_DATA_DIR=/mosquitto/data
       - GCS_BUCKET=${GCS_BUCKET}
       - GCS_SA_KEY_BASE64=${GCS_SA_KEY_BASE64}
-      - GCS_FOLDER=mqtt-daily
+      - GCS_FOLDER=gc-mqtt-daily
     volumes:
       - mqtt-data:/mosquitto/data:ro
     deploy:

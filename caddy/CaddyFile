@@ -39,7 +39,7 @@ pgweb.gc.nu31.space {
         reverse_proxy * infra_pgweb-oauth-proxy:4180
 }
 
-wiki.gc.nu31.space {
+wiki.nu31.space {
         reverse_proxy * infra_wikijs:3000
 }
 
