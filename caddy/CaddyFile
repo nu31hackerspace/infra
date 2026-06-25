@@ -36,7 +36,7 @@ compass.gc.nu31.space {
 }
 
 pgweb.nu31.space {
-        reverse_proxy * infra_pgweb-oauth-proxy:4180
+        reverse_proxy * postgres-viewer:80
 }
 
 wiki.nu31.space {
