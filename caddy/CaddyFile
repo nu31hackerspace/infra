@@ -17,21 +17,17 @@ maintenance.nu31.space {
 	import maintenance
 }
 
-gc.nu31.space {
+nu31.space {
         handle {
                 reverse_proxy * nu31space_app:3000
         }
 }
 
-grafana.gc.nu31.space {
+grafana.nu31.space {
         reverse_proxy * infra_grafana:3000
 }
 
-prismo.gc.nu31.space {
-        reverse_proxy * prismo_app:3000
-}
-
-compass.gc.nu31.space {
+compass.nu31.space {
         reverse_proxy * infra_mongo-rs-viewer:8080
 }
 
@@ -45,6 +41,11 @@ wiki.nu31.space {
 
 events.gc.nu31.space {
         reverse_proxy * gancio_app:13120
+}
+
+
+prismo.gc.nu31.space {
+        reverse_proxy * prismo_app:3000
 }
 
 mqtt.gc.nu31.space {
