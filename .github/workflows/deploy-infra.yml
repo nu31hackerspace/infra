@@ -14,7 +14,7 @@ env:
   USERNAME: ${{ vars.USERNAME }}
   PASSWORD: ${{ secrets.PASSWORD }}
 
-  MQTT_TLS_DOMAIN: mqtt.nu31.space
+  MQTT_TLS_DOMAIN: mqtt.gc.nu31.space
 
   PGWEB_GITHUB_CLIENT_ID: ${{ secrets.PGWEB_GITHUB_CLIENT_ID }}
   PGWEB_GITHUB_CLIENT_SECRET: ${{ secrets.PGWEB_GITHUB_CLIENT_SECRET }}
@@ -58,9 +58,6 @@ jobs:
           - name: mqtt-backup
             context: ./mqtt-backup
             image: mqtt-backup
-          - name: mqtt-logger
-            context: ./mqtt-logger
-            image: mqtt-logger
     
     runs-on: ubuntu-latest
     permissions:

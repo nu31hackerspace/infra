@@ -33,6 +33,7 @@ services:
         "echo $MONGO_RS_KEYFILE_CONTENT > /data/keyfile && chmod 400 /data/keyfile && chown 999:999 /data/keyfile && docker-entrypoint.sh mongod --replSet rs0 --keyFile /data/keyfile --bind_ip_all",
       ]
     environment:
+      - GLIBC_TUNABLES="glibc.cpu.hwcaps=-SHSTK"
       - MONGO_INITDB_ROOT_USERNAME=${USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${PASSWORD}
       - MONGO_RS_KEYFILE_CONTENT=${MONGO_RS_KEYFILE_CONTENT}
@@ -46,7 +47,7 @@ services:
 
   mongo-rs-init:
     image: mongo:8.2.3
-    links:
+    depends_on:
       - mongo-rs-1
     command:
       - bash
@@ -67,7 +68,9 @@ services:
         max_attempts: 5
 
   mongo-rs-viewer:
-    image: haohanyang/compass-web:0.3.1
+    image: haohanyang/compass-web:0.5.0
+    depends_on:
+      - mongo-rs-1
     environment:
       - CW_MONGO_URI=mongodb://${USERNAME}:${PASSWORD}@mongo-rs-1:27017/?replicaSet=rs0&authSource=admin
       - CW_BASIC_AUTH_USERNAME=${USERNAME}
@@ -89,7 +92,7 @@ services:
       - MONGO_URI=mongodb://${USERNAME}:${PASSWORD}@mongo-rs-1:27017/?replicaSet=rs0&authSource=admin
       - GCS_BUCKET=${GCS_BUCKET}
       - GCS_SA_KEY_BASE64=${GCS_SA_KEY_BASE64}
-      - GCS_FOLDER=mongo-rs-daily
+      - GCS_FOLDER=gc-mongo-daily
     networks:
       - mongo-rs-net
     deploy:
@@ -112,7 +115,7 @@ services:
       - MONGO_URI=mongodb://${USERNAME}:${PASSWORD}@mongo-rs-1:27017/?replicaSet=rs0&authSource=admin
       - GCS_BUCKET=${GCS_BUCKET}
       - GCS_SA_KEY_BASE64=${GCS_SA_KEY_BASE64}
-      - GCS_FOLDER=mongo-rs-weekly
+      - GCS_FOLDER=gc-mongo-weekly
     networks:
       - mongo-rs-net
     deploy:
@@ -160,29 +163,6 @@ services:
         condition: on-failure
         delay: 5s
 
-  pgweb-oauth-proxy:
-    image: quay.io/oauth2-proxy/oauth2-proxy:v7.7.1
-    command:
-      - --provider=github
-      - --github-org=nu31hackerspace
-      - --upstream=http://postgres-viewer:80/
-      - --http-address=0.0.0.0:4180
-      - --redirect-url=https://pgweb.nu31.space/oauth2/callback
-      - --email-domain=*
-      - --cookie-secure=true
-      - --cookie-domain=pgweb.nu31.space
-      - --cookie-name=_oauth2_proxy_pgweb
-    environment:
-      - OAUTH2_PROXY_CLIENT_ID=${PGWEB_GITHUB_CLIENT_ID}
-      - OAUTH2_PROXY_CLIENT_SECRET=${PGWEB_GITHUB_CLIENT_SECRET}
-      - OAUTH2_PROXY_COOKIE_SECRET=${PGWEB_OAUTH2_COOKIE_SECRET}
-    networks:
-      - reverse-proxy
-      - postgres-net
-    deploy:
-      restart_policy:
-        condition: on-failure
-
   postgres-backup-daily:
     image: ghcr.io/${OWNER_NAME}/postgres-backup:${GIT_COMMIT_SHA}
     command: ["/usr/local/bin/backup.sh"]
@@ -196,7 +176,7 @@ services:
       - PGPASSWORD=${PASSWORD}
       - GCS_BUCKET=${GCS_BUCKET}
       - GCS_SA_KEY_BASE64=${GCS_SA_KEY_BASE64}
-      - GCS_FOLDER=postgres-daily
+      - GCS_FOLDER=gc-postgres-daily
     networks:
       - postgres-net
     deploy:
@@ -222,7 +202,7 @@ services:
       - PGPASSWORD=${PASSWORD}
       - GCS_BUCKET=${GCS_BUCKET}
       - GCS_SA_KEY_BASE64=${GCS_SA_KEY_BASE64}
-      - GCS_FOLDER=postgres-weekly
+      - GCS_FOLDER=gc-postgres-weekly
     networks:
       - postgres-net
     deploy:
@@ -245,7 +225,7 @@ services:
       - CADDY_DATA_DIR=/caddy_storage
       - GCS_BUCKET=${GCS_BUCKET}
       - GCS_SA_KEY_BASE64=${GCS_SA_KEY_BASE64}
-      - GCS_FOLDER=caddy-daliy
+      - GCS_FOLDER=gc-caddy-daliy
     volumes:
       - caddy-data:/caddy_storage
     deploy:
@@ -317,7 +297,7 @@ services:
       - GRAFANA_DATA_DIR=/var/lib/grafana/grafana.db
       - GCS_BUCKET=${GCS_BUCKET}
       - GCS_SA_KEY_BASE64=${GCS_SA_KEY_BASE64}
-      - GCS_FOLDER=grafana-daily
+      - GCS_FOLDER=gc-grafana-daily
     volumes:
       - grafana-data:/var/lib/grafana
     deploy:
@@ -390,26 +370,6 @@ services:
         limits:
           memory: 256M
 
-  mqtt-logger:
-    image: ghcr.io/${OWNER_NAME}/mqtt-logger:${GIT_COMMIT_SHA}
-    environment:
-      - MQTT_HOST=mqtt
-      - MQTT_PORT=1883
-      - MQTT_USER=${USERNAME}
-      - MQTT_PASSWORD=${PASSWORD}
-      - PGHOST=postgres-1
-      - PGPORT=5432
-      - PGUSER=${USERNAME}
-      - PGPASSWORD=${PASSWORD}
-      - PGDATABASE=mqtt_store
-    networks:
-      - mqtt-net
-      - postgres-net
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-
   mqtt-backup-daily:
     image: ghcr.io/${OWNER_NAME}/mqtt-backup:${GIT_COMMIT_SHA}
     command: ["/usr/local/bin/backup.sh"]
@@ -420,7 +380,7 @@ services:
       - MQTT_DATA_DIR=/mosquitto/data
       - GCS_BUCKET=${GCS_BUCKET}
       - GCS_SA_KEY_BASE64=${GCS_SA_KEY_BASE64}
-      - GCS_FOLDER=mqtt-daily
+      - GCS_FOLDER=gc-mqtt-daily
     volumes:
       - mqtt-data:/mosquitto/data:ro
     deploy:

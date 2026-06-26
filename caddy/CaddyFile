@@ -20,7 +20,7 @@ maintenance.nu31.space {
 nu31.space {
         @matrix_wellknown path /.well-known/matrix/*
         handle @matrix_wellknown {
-                reverse_proxy 10.10.10.2:81 {
+                reverse_proxy matrix.nu31.space {
                         header_up X-Real-IP {remote_host}
                         header_up X-Forwarded-For {remote_host}
                         header_up X-Forwarded-Port {http.request.port}
@@ -31,7 +31,6 @@ nu31.space {
                         header_up Host matrix.nu31.space
                 }
         }
-
         handle {
                 reverse_proxy * nu31space_app:3000
         }
@@ -41,139 +40,20 @@ grafana.nu31.space {
         reverse_proxy * infra_grafana:3000
 }
 
-prismo.nu31.space {
-        reverse_proxy * prismo_app:3000
-}
-
 compass.nu31.space {
         reverse_proxy * infra_mongo-rs-viewer:8080
 }
 
 pgweb.nu31.space {
-        reverse_proxy * infra_pgweb-oauth-proxy:4180
-}
-
-element.nu31.space {
-        reverse_proxy 10.10.10.2:81 {
-                header_up X-Real-IP {remote_host}
-                header_up X-Forwarded-For {remote_host}
-                header_up X-Forwarded-Port {http.request.port}
-                header_up X-Forwarded-TlsProto {tls_protocol}
-                header_up X-Forwarded-TlsCipher {tls_cipher}
-                header_up X-Forwarded-HttpsProto {proto}
-                header_up X-Forwarded-Proto {scheme}
-                header_up Host element.nu31.space
-        }
-}
-
-cinny.nu31.space {
-        reverse_proxy 10.10.10.2:81 {
-                header_up X-Real-IP {remote_host}
-                header_up X-Forwarded-For {remote_host}
-                header_up X-Forwarded-Port {http.request.port}
-                header_up X-Forwarded-TlsProto {tls_protocol}
-                header_up X-Forwarded-TlsCipher {tls_cipher}
-                header_up X-Forwarded-HttpsProto {proto}
-                header_up X-Forwarded-Proto {scheme}
-                header_up Host cinny.nu31.space
-        }
+        reverse_proxy * postgres-viewer:80
 }
 
 wiki.nu31.space {
         reverse_proxy * infra_wikijs:3000
 }
 
-events.nu31.space {
-        reverse_proxy * gancio_app:13120
-}
-
-matrix.nu31.space {
-        reverse_proxy 10.10.10.2:81 {
-                header_up X-Real-IP {remote_host}
-                header_up X-Forwarded-For {remote_host}
-                header_up X-Forwarded-Port {http.request.port}
-                header_up X-Forwarded-TlsProto {tls_protocol}
-                header_up X-Forwarded-TlsCipher {tls_cipher}
-                header_up X-Forwarded-HttpsProto {proto}
-                header_up X-Forwarded-Proto {scheme}
-                header_up Host matrix.nu31.space
-        }
-}
-
-matrix.nu31.space:8448 {
-        reverse_proxy 10.10.10.2:8449 {
-                header_up X-Real-IP {remote_host}
-                header_up X-Forwarded-For {remote_host}
-                header_up X-Forwarded-Port {http.request.port}
-                header_up X-Forwarded-TlsProto {tls_protocol}
-                header_up X-Forwarded-TlsCipher {tls_cipher}
-                header_up X-Forwarded-HttpsProto {proto}
-                header_up X-Forwarded-Proto {scheme}
-                header_up Host matrix.nu31.space
-        }
-}
-
-lemmy.nu31.space {
-        @lemmy_api path /api/* /pictrs/* /feeds/* /nodeinfo/* /.well-known/*
-        @lemmy_activity header Accept *application/activity+json*
-        @lemmy_ld header Accept *application/ld+json*
-        @lemmy_post method POST
-
-        handle @lemmy_api {
-                reverse_proxy 10.10.10.2:8536 {
-                        header_up X-Real-IP {remote_host}
-                        header_up X-Forwarded-For {remote_host}
-                        header_up X-Forwarded-Proto {scheme}
-                        header_up Host {host}
-                }
-        }
-
-        handle @lemmy_activity {
-                reverse_proxy 10.10.10.2:8536 {
-                        header_up X-Real-IP {remote_host}
-                        header_up X-Forwarded-For {remote_host}
-                        header_up X-Forwarded-Proto {scheme}
-                        header_up Host {host}
-                }
-        }
-
-        handle @lemmy_ld {
-                reverse_proxy 10.10.10.2:8536 {
-                        header_up X-Real-IP {remote_host}
-                        header_up X-Forwarded-For {remote_host}
-                        header_up X-Forwarded-Proto {scheme}
-                        header_up Host {host}
-                }
-        }
-
-        handle @lemmy_post {
-                reverse_proxy 10.10.10.2:8536 {
-                        header_up X-Real-IP {remote_host}
-                        header_up X-Forwarded-For {remote_host}
-                        header_up X-Forwarded-Proto {scheme}
-                        header_up Host {host}
-                }
-        }
-
-        handle {
-                reverse_proxy 10.10.10.2:1234
-        }
-}
-
-a.lemmy.nu31.space {
-        reverse_proxy 10.10.10.2:3000
-}
-
-zulip.nu31.space {
-        reverse_proxy https://10.10.10.2:443 {
-                transport http {
-                        tls_insecure_skip_verify
-                }
-                header_up X-Real-IP {remote_host}
-                header_up X-Forwarded-For {remote_host}
-                header_up X-Forwarded-Proto {scheme}
-                header_up Host {host}
-        }
+prismo.nu31.space {
+        reverse_proxy * prismo_app:3000
 }
 
 mqtt.nu31.space {
@@ -182,3 +62,4 @@ mqtt.nu31.space {
         # MQTT clients connect directly on port 8883 (MQTTS), not through Caddy.
         respond "MQTT broker — connect on port 8883 via MQTTS" 200
 }
+
