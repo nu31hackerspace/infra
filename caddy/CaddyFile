@@ -18,6 +18,19 @@ maintenance.nu31.space {
 }
 
 nu31.space {
+        @matrix_wellknown path /.well-known/matrix/*
+        handle @matrix_wellknown {
+                reverse_proxy matrix.nu31.space {
+                        header_up X-Real-IP {remote_host}
+                        header_up X-Forwarded-For {remote_host}
+                        header_up X-Forwarded-Port {http.request.port}
+                        header_up X-Forwarded-TlsProto {tls_protocol}
+                        header_up X-Forwarded-TlsCipher {tls_cipher}
+                        header_up X-Forwarded-HttpsProto {proto}
+                        header_up X-Forwarded-Proto {scheme}
+                        header_up Host matrix.nu31.space
+                }
+        }
         handle {
                 reverse_proxy * nu31space_app:3000
         }
