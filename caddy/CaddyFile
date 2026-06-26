@@ -43,7 +43,7 @@ wiki.nu31.space {
         reverse_proxy * infra_wikijs:3000
 }
 
-events.nu31.space {
+events.gc.nu31.space {
         reverse_proxy * gancio_app:13120
 }
 
