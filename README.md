@@ -1,5 +1,9 @@
 # Infra for pet project
 
+**Keep in mind, now infra project works with new VM all changes will apply to VM by ${HOST} variable.**
+
+---
+
 We build real **uncloud** here.
 
 The project with all scripts for setup an infrastructure for simple pet project, without over engineering, but with all required components, such as backups for database, backup for reverse proxy etc.
