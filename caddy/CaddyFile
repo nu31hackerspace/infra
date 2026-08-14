@@ -36,6 +36,10 @@ nu31.space {
         }
 }
 
+www.nu31.space {
+        redir https://nu31.space{uri} permanent
+}
+
 grafana.nu31.space {
         reverse_proxy * infra_grafana:3000
 }
