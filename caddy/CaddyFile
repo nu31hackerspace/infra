@@ -67,3 +67,6 @@ mqtt.nu31.space {
         respond "MQTT broker — connect on port 8883 via MQTTS" 200
 }
 
+events.nu31.space {
+        reverse_proxy * gancio_app:13120
+}
