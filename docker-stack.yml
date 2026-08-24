@@ -311,10 +311,33 @@ services:
       restart_policy:
         condition: none
 
+  loki-init:
+    image: alpine:3.21
+    # Loki runs as uid 10001 but docker creates the loki-data volume as root,
+    # and the loki image is distroless so it cannot fix that itself. This
+    # one-shot task prepares the data directories on every deploy. Same idea
+    # as mongo-rs-init above.
+    command:
+      - sh
+      - -c
+      - |
+        mkdir -p /loki/chunks /loki/rules /loki/rules-temp /loki/compactor /loki/wal
+        chown -R 10001:10001 /loki
+        echo "loki data dir ready"
+    volumes:
+      - loki-data:/loki
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: none
+
   loki:
     image: ghcr.io/${OWNER_NAME}/loki:${GIT_COMMIT_SHA}
     # Log storage for the whole swarm. Not published through caddy, only
     # grafana and the alloy collectors talk to it over logs-net.
+    depends_on:
+      - loki-init
     volumes:
       - loki-data:/loki
     environment:

@@ -27,69 +27,16 @@ env:
   GCS_SA_KEY_BASE64: ${{ secrets.GCS_SA_KEY_BASE64 }}
 
 jobs:
+  # The image list lives in build-images.yml, shared with the pull request
+  # build, so a PR always builds exactly what the deploy will push.
   build-and-push:
-    strategy:
-      matrix:
-        include:
-          - name: mongo-rs-backup
-            context: ./mongo-rs-backup
-            image: mongo-rs-backup
-          - name: caddy
-            context: ./caddy
-            image: caddy
-          - name: caddy-backup
-            context: ./caddy-backup
-            image: caddy-backup
-          - name: grafana
-            context: ./grafana
-            image: grafana
-          - name: grafana-backup
-            context: ./grafana-backup
-            image: grafana-backup
-          - name: telegraf
-            context: ./telegraf
-            image: telegraf
-          - name: loki
-            context: ./loki
-            image: loki
-          - name: alloy
-            context: ./alloy
-            image: alloy
-          - name: postgres-backup
-            context: ./postgres-backup
-            image: postgres-backup
-          - name: mqtt
-            context: ./mqtt
-            image: mqtt
-          - name: mqtt-backup
-            context: ./mqtt-backup
-            image: mqtt-backup
-    
-    runs-on: ubuntu-latest
+    uses: ./.github/workflows/build-images.yml
+    with:
+      push: true
     permissions:
       contents: read
       packages: write
       id-token: write
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Log in to the Container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: ${{ matrix.context }}
-          push: true
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.OWNER_NAME }}/${{ matrix.image }}:latest
-            ${{ env.REGISTRY }}/${{ env.OWNER_NAME }}/${{ matrix.image }}:${{ github.sha }}
 
   deploy:
     runs-on: ubuntu-latest

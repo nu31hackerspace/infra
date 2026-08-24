@@ -54,6 +54,9 @@ Two services do the job:
 - **loki** (`grafana/loki`) stores the logs on the `loki-data` volume. It is a single
   node, filesystem backed setup, no object storage, no clustering. Config:
   `loki/loki-config.yml`.
+- **loki-init** is a one-shot task (like `mongo-rs-init`) that prepares the data
+  directories on the `loki-data` volume for uid `10001`. The loki image is
+  distroless and cannot chown its own volume.
 
 Both live on the private `logs-net` overlay network together with Grafana. Loki is
 **not** published through Caddy, the only way to read the logs is Grafana.
@@ -114,6 +117,19 @@ Backups authenticate with a Google Cloud service account that has the `Storage O
 - `secrets.GCS_SA_KEY_BASE64` — the service account JSON key, base64-encoded (e.g. `base64 -w0 key.json`).
 
 ## Build & deploy
+
+Two workflows:
+
+- `.github/workflows/build-images.yml` holds the list of all images of the infra.
+  It runs on **every pull request** and only builds the images, so a broken
+  Dockerfile is caught in the pull request instead of breaking the deploy of main.
+  One failing image does not cancel the others (`fail-fast: false`).
+- `.github/workflows/deploy-infra.yml` runs on push to `main`. It calls
+  `build-images.yml` with `push: true` to build and push all images to ghcr.io,
+  and then deploys the stack over ssh.
+
+Because both flows use the same image list, a green pull request means the deploy
+will build the same set of images successfully.
 
 For more details, take a look at [project github action](https://github.com/VovaStelmashchuk/infra/tree/main/.github/workflows)
 
