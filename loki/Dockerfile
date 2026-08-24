@@ -1,15 +1,10 @@
 FROM grafana/loki:3.5.1
 
-# su-exec lets the entrypoint fix the volume ownership as root and then drop
-# back to the unprivileged loki user (uid 10001) before starting Loki itself.
-USER root
-RUN apk add --no-cache su-exec
-
+# The base image is distroless (no shell tooling, no package manager), so the
+# image only carries our config. Ownership of the /loki volume is prepared by
+# the loki-init service in docker-stack.yml.
 COPY loki-config.yml /etc/loki/config.yml
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
 
 EXPOSE 3100
 
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["-config.file=/etc/loki/config.yml"]

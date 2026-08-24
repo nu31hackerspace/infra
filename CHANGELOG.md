@@ -2,6 +2,19 @@
 
 The document for keep the track of all changes for the NU31 infrastructure.
 
+## 24.08.2026
+
+Build all docker images on every pull request.
+
+The image list moved into the reusable workflow `.github/workflows/build-images.yml`,
+which runs on pull requests (build only) and is called by the deploy workflow with
+`push: true`. Fixes the case when a broken Dockerfile was noticed only after the
+merge into main.
+
+Fix the loki image build: the loki base image is distroless, so `apk` is not
+available. The image now only carries the config, and the new one-shot `loki-init`
+service prepares the ownership of the loki data volume.
+
 ## 23.08.2026
 
 Add centralized logging for all containers of the swarm.
