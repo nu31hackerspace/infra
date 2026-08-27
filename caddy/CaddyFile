@@ -70,3 +70,7 @@ mqtt.nu31.space {
 events.nu31.space {
         reverse_proxy * gancio_app:13120
 }
+
+community.nu31.space {
+    reverse_proxy * nodebb_app:4567
+}
