@@ -74,3 +74,7 @@ events.nu31.space {
 community.nu31.space {
     reverse_proxy * nodebb_app:4567
 }
+
+cnc.nu31.space {
+    reverse_proxy * cncjs_app:8000
+}
