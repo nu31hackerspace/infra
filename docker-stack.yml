@@ -363,8 +363,17 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - alloy-data:/var/lib/alloy/data
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /etc:/host/etc:ro
+      - /:/rootfs:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /sys:/sys:ro
     environment:
       - TZ=UTC
+      - HOST_PROC=/host/proc
+      - HOST_SYS=/host/sys
+      - HOST_ETC=/host/etc
     networks:
       - logs-net
     deploy:
@@ -376,31 +385,27 @@ services:
         limits:
           memory: 512M
 
-  telegraf:
-    image: ghcr.io/${OWNER_NAME}/telegraf:${GIT_COMMIT_SHA}
-    hostname: "{{.Node.Hostname}}"
-    networks:
-      - mongo-rs-net
-      - mqtt-net
-    environment:
-      - HOST_PROC=/host/proc
-      - HOST_SYS=/host/sys
-      - HOST_ETC=/host/etc
-      - MONGO_URL=mongodb://${USERNAME}:${PASSWORD}@mongo-rs-1:27017/?replicaSet=rs0&authSource=admin
-      - MQTT_HOST=mqtt
-      - MQTT_PORT=1883
-      - MQTT_USER=${USERNAME}
-      - MQTT_PASSWORD=${PASSWORD}
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-remote-write-receiver'
+      - '--storage.tsdb.retention.time=15d'
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /proc:/host/proc
-      - /sys:/host/sys
-      - /etc:/host/etc
+      - prometheus-data:/prometheus
+    networks:
+      - logs-net
     deploy:
-      mode: global
+      mode: replicated
+      replicas: 1
       restart_policy:
         condition: on-failure
-
+      resources:
+        limits:
+          memory: 512M
   mqtt:
     image: ghcr.io/${OWNER_NAME}/mqtt:${GIT_COMMIT_SHA}
     ports:
@@ -512,3 +517,4 @@ volumes:
   mqtt-log:
   loki-data:
   alloy-data:
+  prometheus-data:
