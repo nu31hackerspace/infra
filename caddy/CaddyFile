@@ -60,6 +60,18 @@ prismo.nu31.space {
         reverse_proxy * prismo_app:3000
 }
 
+prismo2.nu31.space {
+	handle /api/* {
+		reverse_proxy prismo2_backend:4000
+	}
+	handle /socket.io/* {
+		reverse_proxy prismo2_backend:4000
+	}
+	handle {
+		reverse_proxy prismo2_client:5173
+	}
+}
+
 mqtt.nu31.space {
         # Caddy obtains and renews the TLS cert for this domain.
         # The cert is read by the MQTT container from the shared caddy-data volume.
