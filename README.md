@@ -260,3 +260,29 @@ node mqtt.js --mode=read --topic=my/topic
 
 # Write (publish one message and exit)
 node mqtt.js --mode=write --topic=my/topic --message="hello world"
+
+### MQTT history
+
+The `mqtt-logger` service (`mqtt-logger/logger.ts`) subscribes to `#` and stores every
+message into the `mqtt_history` table of the `mqtt_store` PostgreSQL database. Messages
+are kept for **24 hours** (`RETENTION_HOURS`), older rows are deleted every 10 minutes.
+
+Open the **MQTT history** dashboard in Grafana and type a topic filter into the
+`Topic` box, using the same syntax as an MQTT subscription:
+
+| filter                  | shows                                      |
+| ----------------------- | ------------------------------------------ |
+| `#`                     | every topic                                |
+| `prismo/#`              | `prismo` and everything below it           |
+| `sensors/+/temperature` | one level wildcard                         |
+| `prismo/door/state`     | exactly that topic                         |
+
+The same filter works in your own SQL through the `mqtt_topic_matches(topic, filter)`
+function:
+
+```sql
+SELECT received_at, topic, payload
+FROM mqtt_history
+WHERE mqtt_topic_matches(topic, 'prismo/#')
+ORDER BY received_at DESC;
+```

@@ -1,0 +1,156 @@
+{
+  "uid": "mqtt-history",
+  "title": "MQTT history",
+  "description": "Every MQTT message of the last 24 hours, recorded into PostgreSQL by the mqtt-logger service.",
+  "tags": ["mqtt"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": { "refresh_intervals": ["5s", "10s", "30s", "1m", "5m"] },
+  "templating": {
+    "list": [
+      {
+        "name": "topic",
+        "label": "Topic",
+        "type": "textbox",
+        "query": "#",
+        "current": { "text": "#", "value": "#" },
+        "description": "MQTT topic filter, same syntax as a subscription: # for everything, prismo/# for a subtree, sensors/+/temperature, or an exact topic name"
+      },
+      {
+        "name": "limit",
+        "label": "Max messages",
+        "type": "custom",
+        "query": "100,500,1000,5000",
+        "current": { "text": "500", "value": "500" },
+        "options": [
+          { "text": "100", "value": "100", "selected": false },
+          { "text": "500", "value": "500", "selected": true },
+          { "text": "1000", "value": "1000", "selected": false },
+          { "text": "5000", "value": "5000", "selected": false }
+        ]
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Messages per topic on $topic",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "mqtt-history" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-postgresql-datasource", "uid": "mqtt-history" },
+          "editorMode": "code",
+          "rawQuery": true,
+          "format": "time_series",
+          "rawSql": "SELECT\n  $__timeGroupAlias(received_at, $__interval, 0),\n  topic AS metric,\n  count(*) AS messages\nFROM mqtt_history\nWHERE $__timeFilter(received_at)\n  AND mqtt_topic_matches(topic, ${topic:sqlstring})\nGROUP BY 1, 2\nORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": { "drawStyle": "bars", "fillOpacity": 60, "stacking": { "mode": "normal" } }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "right", "calcs": ["sum"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      }
+    },
+    {
+      "id": 2,
+      "type": "table",
+      "title": "Topics on $topic",
+      "description": "Click a topic to show only its messages",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 8 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "mqtt-history" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-postgresql-datasource", "uid": "mqtt-history" },
+          "editorMode": "code",
+          "rawQuery": true,
+          "format": "table",
+          "rawSql": "SELECT DISTINCT ON (topic)\n  topic,\n  count(*) OVER (PARTITION BY topic) AS messages,\n  received_at AS last_seen,\n  payload AS last_payload\nFROM mqtt_history\nWHERE $__timeFilter(received_at)\n  AND mqtt_topic_matches(topic, ${topic:sqlstring})\nORDER BY topic, received_at DESC"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "custom": { "inspect": true } },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "topic" },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Show messages of ${__value.raw}",
+                    "url": "/d/mqtt-history/mqtt-history?var-topic=${__value.raw:percentencode}&var-limit=${limit}&${__url_time_range}"
+                  }
+                ]
+              },
+              { "id": "custom.width", "value": 320 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "messages" },
+            "properties": [{ "id": "custom.width", "value": 100 }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "last_seen" },
+            "properties": [{ "id": "custom.width", "value": 200 }]
+          }
+        ]
+      },
+      "options": { "showHeader": true, "cellHeight": "sm" }
+    },
+    {
+      "id": 3,
+      "type": "table",
+      "title": "Messages on $topic (latest $limit)",
+      "gridPos": { "h": 18, "w": 24, "x": 0, "y": 18 },
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "mqtt-history" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-postgresql-datasource", "uid": "mqtt-history" },
+          "editorMode": "code",
+          "rawQuery": true,
+          "format": "table",
+          "rawSql": "SELECT\n  received_at AS time,\n  topic,\n  payload,\n  qos,\n  retain\nFROM mqtt_history\nWHERE $__timeFilter(received_at)\n  AND mqtt_topic_matches(topic, ${topic:sqlstring})\nORDER BY received_at DESC\nLIMIT $limit"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "custom": { "inspect": true } },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "time" },
+            "properties": [
+              { "id": "unit", "value": "dateTimeAsIso" },
+              { "id": "custom.width", "value": 200 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "topic" },
+            "properties": [{ "id": "custom.width", "value": 320 }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "qos" },
+            "properties": [{ "id": "custom.width", "value": 60 }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "retain" },
+            "properties": [{ "id": "custom.width", "value": 70 }]
+          }
+        ]
+      },
+      "options": { "showHeader": true, "cellHeight": "sm" }
+    }
+  ]
+}

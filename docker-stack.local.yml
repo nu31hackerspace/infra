@@ -115,8 +115,7 @@ services:
   mqtt-logger:
     image: infra_mqtt-logger:local
     environment:
-      - MQTT_HOST=mqtt
-      - MQTT_PORT=1883
+      - MQTT_URL=mqtt://mqtt:1883
       - MQTT_USER=${USERNAME}
       - MQTT_PASSWORD=${PASSWORD}
       - PGHOST=postgres-1
@@ -124,6 +123,7 @@ services:
       - PGUSER=${USERNAME}
       - PGPASSWORD=${PASSWORD}
       - PGDATABASE=mqtt_store
+      - RETENTION_HOURS=24
     networks:
       - mqtt-net
       - postgres-net

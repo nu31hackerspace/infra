@@ -231,6 +231,9 @@ services:
       # Used by the provisioned MQTT datasource (grafana/provisioning/datasources/mqtt.yml)
       - MQTT_USER=${USERNAME}
       - MQTT_PASSWORD=${PASSWORD}
+      # Read-only role of the "MQTT history" datasource, created by mqtt-logger.
+      - MQTT_HISTORY_DB_USER=mqtt_history_reader
+      - MQTT_HISTORY_DB_PASSWORD=${PASSWORD}
     deploy:
       update_config:
         order: start-first
@@ -392,6 +395,39 @@ services:
         parallelism: 1
         delay: 10s
         failure_action: rollback
+      resources:
+        limits:
+          memory: 256M
+
+  mqtt-logger:
+    image: ghcr.io/${OWNER_NAME}/mqtt-logger:${GIT_COMMIT_SHA}
+    # Records every message of every topic into postgres (mqtt_store.mqtt_history)
+    # and deletes messages older than RETENTION_HOURS. Browsable in Grafana on the
+    # "MQTT history" dashboard.
+    depends_on:
+      - mqtt
+      - postgres-1
+    environment:
+      - MQTT_URL=mqtt://mqtt:1883
+      - MQTT_USER=${USERNAME}
+      - MQTT_PASSWORD=${PASSWORD}
+      - PGHOST=postgres-1
+      - PGPORT=5432
+      - PGUSER=${USERNAME}
+      - PGPASSWORD=${PASSWORD}
+      - PGDATABASE=mqtt_store
+      - RETENTION_HOURS=24
+      - READER_USER=mqtt_history_reader
+      - READER_PASSWORD=${PASSWORD}
+    networks:
+      - mqtt-net
+      - postgres-net
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
       resources:
         limits:
           memory: 256M

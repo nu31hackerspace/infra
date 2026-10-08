@@ -2,6 +2,16 @@
 
 The document for keep the track of all changes for the NU31 infrastructure.
 
+## 08.10.2026
+
+Bring back the `mqtt-logger` service, now with a retention limit.
+
+It subscribes to `#` on the broker and records every message into the
+`mqtt_store.mqtt_history` table in PostgreSQL. Messages older than 24 hours are
+deleted every 10 minutes, so the table no longer grows unbounded. Grafana gets the
+`MQTT history` datasource (read-only role `mqtt_history_reader`) and the
+`MQTT history` dashboard, filterable with MQTT topic filters like `#` or `prismo/#`.
+
 ## 24.08.2026
 
 Build all docker images on every pull request.

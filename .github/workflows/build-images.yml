@@ -60,6 +60,9 @@ jobs:
           - name: mqtt-backup
             context: ./mqtt-backup
             image: mqtt-backup
+          - name: mqtt-logger
+            context: ./mqtt-logger
+            image: mqtt-logger
 
     name: build (${{ matrix.name }})
     runs-on: ubuntu-latest

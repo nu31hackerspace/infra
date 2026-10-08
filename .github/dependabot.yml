@@ -41,6 +41,16 @@ updates:
       interval: "weekly"
 
   - package-ecosystem: "docker"
+    directory: "/mqtt-logger"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "npm"
+    directory: "/mqtt-logger"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "weekly"
