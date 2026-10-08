@@ -34,26 +34,26 @@ if [ -n "${MQTT_TLS_DOMAIN:-}" ]; then
     WAITED=0
     until [ -f "${CERT_FILE}" ] && [ -f "${KEY_FILE}" ]; do
         if [ "${WAITED}" -ge 60 ]; then
-            echo "[entrypoint] ERROR: TLS cert not found after 60s." \
-                 "Ensure Caddy is running and DNS for ${MQTT_TLS_DOMAIN} is configured."
-            exit 1
+            break
         fi
         sleep 5
         WAITED=$((WAITED + 5))
     done
-    echo "[entrypoint] TLS certificate found."
 
-    # Copy certs to a mosquitto-readable location — the caddy-data volume is
-    # mounted read-only and Caddy owns the files (root:root 0600), so mosquitto
-    # cannot read them directly.
-    LOCAL_CERT_DIR="/mosquitto/data/tls"
-    mkdir -p "${LOCAL_CERT_DIR}"
-    cp "${CERT_FILE}" "${LOCAL_CERT_DIR}/server.crt"
-    cp "${KEY_FILE}"  "${LOCAL_CERT_DIR}/server.key"
-    chown mosquitto:mosquitto "${LOCAL_CERT_DIR}/server.crt" "${LOCAL_CERT_DIR}/server.key"
-    chmod 0640 "${LOCAL_CERT_DIR}/server.crt" "${LOCAL_CERT_DIR}/server.key"
+    if [ -f "${CERT_FILE}" ] && [ -f "${KEY_FILE}" ]; then
+        echo "[entrypoint] TLS certificate found."
 
-    cat >> "${CONF_FILE}" <<EOF
+        # Copy certs to a mosquitto-readable location — the caddy-data volume is
+        # mounted read-only and Caddy owns the files (root:root 0600), so mosquitto
+        # cannot read them directly.
+        LOCAL_CERT_DIR="/mosquitto/data/tls"
+        mkdir -p "${LOCAL_CERT_DIR}"
+        cp "${CERT_FILE}" "${LOCAL_CERT_DIR}/server.crt"
+        cp "${KEY_FILE}"  "${LOCAL_CERT_DIR}/server.key"
+        chown mosquitto:mosquitto "${LOCAL_CERT_DIR}/server.crt" "${LOCAL_CERT_DIR}/server.key"
+        chmod 0640 "${LOCAL_CERT_DIR}/server.crt" "${LOCAL_CERT_DIR}/server.key"
+
+        cat >> "${CONF_FILE}" <<EOF
 
 listener ${MQTT_TLS_PORT}
 allow_anonymous false
@@ -61,6 +61,13 @@ cafile /etc/ssl/certs/ca-certificates.crt
 certfile ${LOCAL_CERT_DIR}/server.crt
 keyfile ${LOCAL_CERT_DIR}/server.key
 EOF
+    else
+        # Don't take the internal plain listener (used by Grafana etc.) down
+        # just because the public TLS cert isn't available yet.
+        echo "[entrypoint] WARNING: TLS cert not found after 60s, starting WITHOUT the" \
+             "${MQTT_TLS_PORT} TLS listener. Ensure Caddy is running and DNS for" \
+             "${MQTT_TLS_DOMAIN} is configured, then restart the mqtt service."
+    fi
 fi
 
 # Initialise dynamic security only on first boot (preserve existing device registrations)

@@ -228,6 +228,9 @@ services:
       - GF_AUTH_GITHUB_API_URL=https://api.github.com/user
       - GF_AUTH_GITHUB_ALLOWED_ORGANIZATIONS=["nu31hackerspace"]
       - GF_USERS_AUTO_ASSIGN_ORG_ROLE=Editor
+      # Used by the provisioned MQTT datasource (grafana/provisioning/datasources/mqtt.yml)
+      - MQTT_USER=${USERNAME}
+      - MQTT_PASSWORD=${PASSWORD}
     deploy:
       update_config:
         order: start-first
@@ -238,6 +241,7 @@ services:
       - mongo-rs-net
       - postgres-net
       - logs-net
+      - mqtt-net
 
   grafana-backup-daily:
     image: ghcr.io/${OWNER_NAME}/grafana-backup:${GIT_COMMIT_SHA}
