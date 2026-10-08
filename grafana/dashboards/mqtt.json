@@ -1,0 +1,54 @@
+{
+  "uid": "mqtt-explorer",
+  "title": "MQTT explorer",
+  "tags": ["mqtt"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "",
+  "time": { "from": "now-15m", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "topic",
+        "label": "Topic",
+        "type": "textbox",
+        "query": "#",
+        "current": { "text": "#", "value": "#" },
+        "description": "MQTT topic filter to subscribe to. Supports + and # wildcards, e.g. sensors/+/temperature"
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "table",
+      "title": "Live messages on $topic",
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 0 },
+      "datasource": { "type": "grafana-mqtt-datasource", "uid": "mqtt" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-mqtt-datasource", "uid": "mqtt" },
+          "topic": "$topic"
+        }
+      ],
+      "options": { "showHeader": true }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Numeric values on $topic",
+      "description": "Works when payloads are JSON with numeric fields, e.g. {\"temperature\": 21.5}",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 12 },
+      "datasource": { "type": "grafana-mqtt-datasource", "uid": "mqtt" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-mqtt-datasource", "uid": "mqtt" },
+          "topic": "$topic"
+        }
+      ]
+    }
+  ]
+}

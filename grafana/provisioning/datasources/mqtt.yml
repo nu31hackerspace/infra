@@ -1,0 +1,15 @@
+apiVersion: 1
+
+datasources:
+  - name: MQTT
+    uid: mqtt
+    type: grafana-mqtt-datasource
+    access: proxy
+    isDefault: false
+    editable: false
+    jsonData:
+      # Plain internal listener, reachable only over the mqtt-net overlay network.
+      uri: tcp://mqtt:1883
+      username: ${MQTT_USER}
+    secureJsonData:
+      password: ${MQTT_PASSWORD}
