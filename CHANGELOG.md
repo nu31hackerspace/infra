@@ -2,6 +2,19 @@
 
 The document for keep the track of all changes for the NU31 infrastructure.
 
+## 14.10.2026
+
+Remove the direct `MQTT` datasource from Grafana.
+
+The `grafana-mqtt-datasource` plugin, its provisioned datasource and the
+`MQTT explorer` dashboard are gone, and Grafana no longer joins `mqtt-net`.
+MQTT data is available in Grafana through the `MQTT history` datasource only.
+
+Fix the `Service logs` dashboard failing with "queries require at least one
+regexp or equality matcher that does not have an empty-compatible value" when
+every filter is set to `All`. The `service` and `node` filters now match `.+`
+for `All`. `stack` stays `.*` so containers outside a swarm stack still show up.
+
 ## 08.10.2026
 
 Bring back the `mqtt-logger` service, now with a retention limit.

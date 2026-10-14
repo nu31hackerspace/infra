@@ -1,5 +1,11 @@
 apiVersion: 1
 
+# The direct MQTT datasource was removed together with its plugin. Provisioned
+# datasources stay in the Grafana DB after their file is gone, so drop it explicitly.
+deleteDatasources:
+  - name: MQTT
+    orgId: 1
+
 datasources:
   - name: MQTT history
     uid: mqtt-history
