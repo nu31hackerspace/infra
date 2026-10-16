@@ -1,5 +1,7 @@
 {
         email vovochkastelmashchuk@gmail.com
+        # Cloudflare terminates TLS; origin serves plain HTTP and never redirects.
+        auto_https disable_redirects
         storage file_system {
                 root /caddy_storage/
         }
@@ -13,11 +15,11 @@
 	}
 }
 
-maintenance.nu31.space {
+http://maintenance.nu31.space {
 	import maintenance
 }
 
-nu31.space {
+http://nu31.space {
         @matrix_wellknown path /.well-known/matrix/*
         handle @matrix_wellknown {
                 reverse_proxy matrix.nu31.space {
@@ -36,31 +38,31 @@ nu31.space {
         }
 }
 
-www.nu31.space {
+http://www.nu31.space {
         redir https://nu31.space{uri} permanent
 }
 
-grafana.nu31.space {
+http://grafana.nu31.space {
         reverse_proxy * infra_grafana:3000
 }
 
-compass.nu31.space {
+http://compass.nu31.space {
         reverse_proxy * infra_mongo-rs-viewer:8080
 }
 
-pgweb.nu31.space {
+http://pgweb.nu31.space {
         reverse_proxy * postgres-viewer:80
 }
 
-wiki.nu31.space {
+http://wiki.nu31.space {
         reverse_proxy * infra_wikijs:3000
 }
 
-prismo.nu31.space {
+http://prismo.nu31.space {
         reverse_proxy * prismo_app:3000
 }
 
-prismo2.nu31.space {
+http://prismo2.nu31.space {
 	handle /api/* {
 		reverse_proxy prismo2_backend:4000
 	}
@@ -79,14 +81,14 @@ mqtt.nu31.space {
         respond "MQTT broker — connect on port 8883 via MQTTS" 200
 }
 
-events.nu31.space {
+http://events.nu31.space {
         reverse_proxy * gancio_app:13120
 }
 
-community.nu31.space {
+http://community.nu31.space {
     reverse_proxy * nodebb_app:4567
 }
 
-cnc.nu31.space {
+http://cnc.nu31.space {
     reverse_proxy * cncjs_app:8000
 }
