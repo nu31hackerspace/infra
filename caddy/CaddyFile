@@ -59,10 +59,6 @@ http://wiki.nu31.space {
 }
 
 http://prismo.nu31.space {
-        reverse_proxy * prismo_app:3000
-}
-
-http://prismo2.nu31.space {
 	handle /api/* {
 		reverse_proxy prismo2_backend:4000
 	}
