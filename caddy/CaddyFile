@@ -33,6 +33,9 @@ http://nu31.space {
                         header_up Host matrix.nu31.space
                 }
         }
+      	handle /api/* {
+                reverse_proxy nu31space_backend:3000
+	      }
         handle {
                 reverse_proxy * nu31space_app:3000
         }

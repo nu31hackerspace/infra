@@ -286,3 +286,34 @@ FROM mqtt_history
 WHERE mqtt_topic_matches(topic, 'prismo/#')
 ORDER BY received_at DESC;
 ```
+
+### Create a topic and a user for it
+
+Users and their permissions live in the mosquitto dynamic security plugin
+(`dynsec.json` in the `mqtt-data` volume), so they can be added on the running
+broker, no restart needed. MQTT has no "create topic" step: a topic is a role that
+allows publish + subscribe on `<topic>/#`, given to a new user.
+
+Run on the VPS (replace `sensors/kitchen` and `kitchen-esp`):
+
+```sh
+docker exec -it $(docker ps -qf name=infra_mqtt.1) sh -c '
+  mosquitto_ctrl -u "$MQTT_ADMIN_USER" -P "$MQTT_ADMIN_PASSWORD" dynsec createRole topic:sensors/kitchen &&
+  mosquitto_ctrl -u "$MQTT_ADMIN_USER" -P "$MQTT_ADMIN_PASSWORD" dynsec addRoleACL topic:sensors/kitchen publishClientSend "sensors/kitchen/#" allow &&
+  mosquitto_ctrl -u "$MQTT_ADMIN_USER" -P "$MQTT_ADMIN_PASSWORD" dynsec addRoleACL topic:sensors/kitchen subscribePattern "sensors/kitchen/#" allow &&
+  mosquitto_ctrl -u "$MQTT_ADMIN_USER" -P "$MQTT_ADMIN_PASSWORD" dynsec createClient kitchen-esp &&
+  mosquitto_ctrl -u "$MQTT_ADMIN_USER" -P "$MQTT_ADMIN_PASSWORD" dynsec addClientRole kitchen-esp topic:sensors/kitchen'
+```
+
+`createClient` asks for the new user's password. The device then connects to
+`mqtts://mqtt.nu31.space:8883` with these credentials and can publish and subscribe on
+`sensors/kitchen/#` only, any other topic is denied.
+
+To give one more user access to an existing topic, run only the last two commands.
+To check the result, open a shell in the broker container
+(`docker exec -it $(docker ps -qf name=infra_mqtt.1) sh`) and run:
+
+```sh
+mosquitto_ctrl -u "$MQTT_ADMIN_USER" -P "$MQTT_ADMIN_PASSWORD" dynsec listClients
+mosquitto_ctrl -u "$MQTT_ADMIN_USER" -P "$MQTT_ADMIN_PASSWORD" dynsec getRole topic:sensors/kitchen
+```
