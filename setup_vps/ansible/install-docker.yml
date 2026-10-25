@@ -59,6 +59,12 @@
         state: started
         enabled: yes
 
+    - name: Add deploy user to docker group
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+
     - name: Initialize Docker Swarm
       command: docker swarm init
       register: swarm_result
