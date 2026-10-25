@@ -16,11 +16,11 @@ The project provides all infrastruture require to implement simple pet projects 
 
 The infrastructure includes the following:
 - Docker Swarm
-- MongoDB replica set
+- Postgress
 - Caddy reverse proxy
 - Grafana
 - Centralized logs for every container (Loki + Grafana Alloy)
-- Periodic backups for mongo, grafana, caddy config
+- Periodic backups for postgress
 
 ## Infrastructure components
 
