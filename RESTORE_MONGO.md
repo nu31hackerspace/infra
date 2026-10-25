@@ -1,5 +1,8 @@
 # MongoDB Restore Instructions
 
+> The usual way to restore is the **Restore from backup** GitHub action, see the
+> [Restore](README.md#restore) section of the README. The steps below are the manual fallback.
+
 Based on the analysis of your `infra` project, here is how your MongoDB backup and restore process works.
 
 Your MongoDB setup uses Docker Swarm. The database runs as the `mongo-rs-1` service in the `infra` stack, configured as a single-node replica set (`rs0`), and its data is stored in the Docker volume named **`infra_mongodb-rs-1-data`**.

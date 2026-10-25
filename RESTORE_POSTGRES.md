@@ -1,5 +1,8 @@
 # PostgreSQL Restore Instructions
 
+> The usual way to restore is the **Restore from backup** GitHub action, see the
+> [Restore](README.md#restore) section of the README. The steps below are the manual fallback.
+
 Based on the analysis of your `infra` project, here is how your PostgreSQL backup and restore process works.
 
 Your PostgreSQL setup uses Docker Swarm. The database runs as the `postgres-1` service in the `infra` stack, and its data is stored in the Docker volume named **`infra_postgres-1-data`**.

@@ -116,6 +116,30 @@ Backups authenticate with a Google Cloud service account that has the `Storage O
 - `vars.GCS_BUCKET` — the destination bucket name (no `gs://` prefix).
 - `secrets.GCS_SA_KEY_BASE64` — the service account JSON key, base64-encoded (e.g. `base64 -w0 key.json`).
 
+### Restore
+
+Restoring mongo and postgres is part of the infrastructure too: run the **Restore from backup**
+GitHub action (`.github/workflows/restore-backup.yml`) by hand. Inputs:
+
+- `target` - `mongo-weekly` or `postgres`
+- `backup_file` - `latest`, a file name in the target's bucket folder
+  (`pgdump-2026-10-20_03-30.sql.gz`) or a full `gs://` url
+- `confirm` - the target typed again, the current data is replaced
+
+The mongo and postgres backup images ship a `restore.sh` next to their `backup.sh`. The action
+ssh-es to `HOST` and runs `scripts/restore-on-host.sh`, which starts a one-off container from
+the image of the deployed backup service with that service's env, network and volumes. So the
+restore reads the same bucket folder with the same credentials, and no secret leaves GitHub.
+The stack has to be deployed first.
+
+| target   | what happens                                                                          |
+| -------- | ------------------------------------------------------------------------------------- |
+| mongo    | `mongorestore --drop` of the archive, collections in the backup are replaced          |
+| postgres | `mqtt-logger` and `wikijs` are scaled to 0, every database except `postgres` is dropped, the `public` schema of `postgres` is recreated, then the `pg_dumpall` file is replayed and the services are scaled back. `role ... already exists` errors in the log are expected |
+
+Moving to a new VPS: run **Setup VPS**, deploy the stack, then restore each target. The manual
+steps are kept in `RESTORE_MONGO.md` and `RESTORE_POSTGRES.md`.
+
 ## Build & deploy
 
 Two workflows:
