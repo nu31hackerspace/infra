@@ -13,14 +13,14 @@ datasources:
     access: proxy
     isDefault: false
     editable: false
-    # Reachable over the postgres-net overlay network. The tables are created and
-    # filled by the mqtt-logger service, which also creates the read-only role.
-    url: postgres-1:5432
+    # Azure Database for PostgreSQL. The tables are created and filled by the
+    # mqtt-logger service, which also creates the read-only role.
+    url: main.postgres.database.azure.com:5432
     user: ${MQTT_HISTORY_DB_USER}
     jsonData:
       database: mqtt_store
-      sslmode: disable
-      postgresVersion: 1700
+      sslmode: require
+      postgresVersion: 1800
       timescaledb: false
     secureJsonData:
       password: ${MQTT_HISTORY_DB_PASSWORD}

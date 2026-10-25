@@ -2,6 +2,14 @@
 
 The document for keep the track of all changes for the NU31 infrastructure.
 
+## 25.10.2026
+
+Move PostgreSQL data to Azure Database for PostgreSQL (`main.postgres.database.azure.com`).
+
+`mqtt-logger` and the Grafana `MQTT history` datasource connect to Azure over TLS.
+The `postgres-backup-weekly` service, the `postgres-backup` image and the `postgres`
+target of the **Restore from backup** action are removed, Azure keeps its own backups.
+
 ## 14.10.2026
 
 Remove the direct `MQTT` datasource from Grafana.

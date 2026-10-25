@@ -116,15 +116,24 @@ services:
       - postgres-1-data:/var/lib/postgresql/data
     networks:
       - postgres-net
+    # After an unclean stop postgres runs crash recovery before it accepts
+    # connections, on this disk that can take minutes. A short start_period got
+    # the task killed as unhealthy in the middle of recovery, so it never
+    # finished and looped. Failed checks inside start_period do not count, the
+    # first passing check ends it early, so a normal start is not slowed down.
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${USERNAME}"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
+      start_period: 10m
+    # Default is 10s, then SIGKILL, which leaves the data dir unclean and forces
+    # yet another crash recovery on the next start.
+    stop_grace_period: 2m
     deploy:
       restart_policy:
         condition: on-failure
+        delay: 10s
 
   postgres-viewer:
     image: dpage/pgadmin4:latest
@@ -139,32 +148,6 @@ services:
       restart_policy:
         condition: on-failure
         delay: 5s
-
-  postgres-backup-weekly:
-    image: ghcr.io/${OWNER_NAME}/postgres-backup:${GIT_COMMIT_SHA}
-    command: ["/usr/local/bin/backup.sh"]
-    depends_on:
-      - cron
-      - postgres-1
-    environment:
-      - PGHOST=postgres-1
-      - PGPORT=5432
-      - PGUSER=${USERNAME}
-      - PGPASSWORD=${PASSWORD}
-      - GCS_BUCKET=${GCS_BUCKET}
-      - GCS_SA_KEY_BASE64=${GCS_SA_KEY_BASE64}
-      - GCS_FOLDER=gc-postgres-weekly
-    networks:
-      - postgres-net
-    deploy:
-      mode: replicated
-      replicas: 0
-      labels:
-        - "swarm.cronjob.enable=true"
-        - "swarm.cronjob.schedule=30 3 * * 2"
-        - "swarm.cronjob.skip-running=true"
-      restart_policy:
-        condition: none
 
   caddy-backup-daily:
     image: ghcr.io/${OWNER_NAME}/caddy-backup:${GIT_COMMIT_SHA}
@@ -402,13 +385,15 @@ services:
     # "MQTT history" dashboard.
     depends_on:
       - mqtt
-      - postgres-1
     environment:
       - MQTT_URL=mqtt://mqtt:1883
       - MQTT_USER=${USERNAME}
       - MQTT_PASSWORD=${PASSWORD}
-      - PGHOST=postgres-1
+      # Azure Database for PostgreSQL. node-postgres reads PGSSLMODE, verify-full
+      # checks the certificate against the system CAs, no CA file needed.
+      - PGHOST=main.postgres.database.azure.com
       - PGPORT=5432
+      - PGSSLMODE=verify-full
       - PGUSER=${USERNAME}
       - PGPASSWORD=${PASSWORD}
       - PGDATABASE=mqtt_store
@@ -417,7 +402,6 @@ services:
       - READER_PASSWORD=${PASSWORD}
     networks:
       - mqtt-net
-      - postgres-net
     deploy:
       mode: replicated
       replicas: 1

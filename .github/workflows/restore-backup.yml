@@ -9,9 +9,8 @@ on:
         type: choice
         options:
           - mongo-weekly
-          - postgres
       backup_file:
-        description: "File name in the bucket folder (e.g. pgdump-2026-10-20_03-30.sql.gz), a gs:// url, or latest"
+        description: "File name in the bucket folder (e.g. mongodump-2026-10-20_03-20.gz), a gs:// url, or latest"
         required: true
         default: "latest"
         type: string
@@ -50,10 +49,6 @@ jobs:
           # stop:   services scaled to 0 during the restore, space separated
           case "${{ inputs.target }}" in
             mongo-weekly) echo "backup=mongo-rs-backup-weekly"  >> "$GITHUB_OUTPUT" ;;
-            postgres)     echo "backup=postgres-backup-weekly"  >> "$GITHUB_OUTPUT"
-                          # both create their database on start, they would
-                          # race the restore for it
-                          echo "stop=mqtt-logger wikijs"        >> "$GITHUB_OUTPUT" ;;
           esac
 
       - name: Configure SSH key
