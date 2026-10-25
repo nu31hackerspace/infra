@@ -16,6 +16,7 @@ on:
 env:
   ROOT_SSH_PRIVATE_KEY: ${{ secrets.ROOT_SSH_PRIVATE_KEY }}
   ROOT_SSH_PUBLIC_KEY: ${{ secrets.ROOT_SSH_PUBLIC_KEY }}
+  USERNAME: ${{ vars.USERNAME }}
 
 jobs:
   setup-vps:
@@ -40,7 +41,7 @@ jobs:
         run: |
           cat > /tmp/inventory << EOF
           [vps-servers]
-          vps-server ansible_host=${{ inputs.vps_ip }} ansible_user=root ansible_ssh_private_key_file=~/.ssh/id_rsa
+          vps-server ansible_host=${{ inputs.vps_ip }} ansible_user=${{ env.USERNAME }} ansible_ssh_private_key_file=~/.ssh/id_rsa
           EOF
 
       - name: Run Ansible playbook
@@ -55,7 +56,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Connect to your VPS:" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo "ssh -p ${{ inputs.ssh_port }} root@${{ inputs.vps_ip }}" >> $GITHUB_STEP_SUMMARY
+          echo "ssh -p ${{ inputs.ssh_port }} ${{ env.USERNAME }}@${{ inputs.vps_ip }}" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Next step: init the all needed github action secret and variable" >> $GITHUB_STEP_SUMMARY
