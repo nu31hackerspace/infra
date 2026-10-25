@@ -200,7 +200,6 @@ services:
     image: ghcr.io/${OWNER_NAME}/grafana:${GIT_COMMIT_SHA}
     links:
       - mongo-rs-1
-      - postgres-1
     volumes:
       - grafana-data:/var/lib/grafana
     environment:
@@ -439,13 +438,8 @@ services:
     image: ghcr.io/requarks/wiki:2
     environment:
       - DB_TYPE=postgres
-      - DB_HOST=postgres-1
-      - DB_PORT=5432
-      - DB_USER=${USERNAME}
-      - DB_PASS=${PASSWORD}
-      - DB_NAME=wikijs
+      - DATABASE_URL=postgres://${USERNAME}:${PASSWORD}@main.postgres.database.azure.com:5432/wikijs?sslmode=require
     networks:
-      - postgres-net
       - reverse-proxy
     deploy:
       restart_policy:
