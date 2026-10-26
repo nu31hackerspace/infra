@@ -7,18 +7,6 @@
         }
 }
 
-(maintenance) {
-	handle {
-		root * /etc/caddy
-		rewrite * /maintenance.html
-		file_server
-	}
-}
-
-http://maintenance.nu31.space {
-	import maintenance
-}
-
 http://nu31.space {
         @matrix_wellknown path /.well-known/matrix/*
         handle @matrix_wellknown {
@@ -88,6 +76,3 @@ http://community.nu31.space {
     reverse_proxy * nodebb_app:4567
 }
 
-http://cnc.nu31.space {
-    reverse_proxy * cncjs_app:8000
-}
