@@ -27,7 +27,7 @@ services:
   ferretdb:
     image: ghcr.io/ferretdb/ferretdb:1.24.0
     environment:
-      - FERRETDB_POSTGRESQL_URL=postgres://main.postgres.database.azure.com:5432/ferretdb?sslmode=require
+      - FERRETDB_POSTGRESQL_URL=postgres://${USERNAME}:${PASSWORD}@main.postgres.database.azure.com:5432/ferretdb?sslmode=require
       - FERRETDB_TELEMETRY=disable
       - FERRETDB_STATE_DIR=-
     networks:
