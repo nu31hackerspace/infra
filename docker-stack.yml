@@ -24,55 +24,28 @@ services:
       restart_policy:
         condition: none
 
-  mongo-rs-1:
-    image: mongo:8.2.3
-    command:
-      [
-        "bash",
-        "-c",
-        "echo $MONGO_RS_KEYFILE_CONTENT > /data/keyfile && chmod 400 /data/keyfile && chown 999:999 /data/keyfile && docker-entrypoint.sh mongod --replSet rs0 --keyFile /data/keyfile --bind_ip_all",
-      ]
+  ferretdb:
+    image: ghcr.io/ferretdb/ferretdb:1.24.0
     environment:
-      - GLIBC_TUNABLES="glibc.cpu.hwcaps=-SHSTK"
-      - MONGO_INITDB_ROOT_USERNAME=${USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${PASSWORD}
-      - MONGO_RS_KEYFILE_CONTENT=${MONGO_RS_KEYFILE_CONTENT}
-    volumes:
-      - mongodb-rs-1-data:/data/db
+      - FERRETDB_POSTGRESQL_URL=postgres://main.postgres.database.azure.com:5432/ferretdb?sslmode=require
+      - FERRETDB_TELEMETRY=disable
+      - FERRETDB_STATE_DIR=-
     networks:
       - mongo-rs-net
     deploy:
       restart_policy:
         condition: on-failure
-
-  mongo-rs-init:
-    image: mongo:8.2.3
-    depends_on:
-      - mongo-rs-1
-    command:
-      - bash
-      - -c
-      - |
-        echo "Waiting for mongo-rs-1 to be ready..."
-        until mongosh --host mongo-rs-1 --eval "print(\"waited for connection\")"; do sleep 2; done
-        echo "Initializing Replica Set..."
-        mongosh --host mongo-rs-1 -u $$MONGO_INITDB_ROOT_USERNAME -p $$MONGO_INITDB_ROOT_PASSWORD --eval 'try { rs.status() } catch (err) { rs.initiate({_id: "rs0", members: [{_id: 0, host: "mongo-rs-1:27017"}]}) }'
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=${USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${PASSWORD}
-    networks:
-      - mongo-rs-net
-    deploy:
-      restart_policy:
-        condition: on-failure
-        max_attempts: 5
+        delay: 5s
+      resources:
+        limits:
+          memory: 512M
 
   mongo-rs-viewer:
     image: haohanyang/compass-web:0.5.0
     depends_on:
-      - mongo-rs-1
+      - ferretdb
     environment:
-      - CW_MONGO_URI=mongodb://${USERNAME}:${PASSWORD}@mongo-rs-1:27017/?replicaSet=rs0&authSource=admin
+      - CW_MONGO_URI=mongodb://${USERNAME}:${PASSWORD}@ferretdb:27017/?authMechanism=PLAIN
       - CW_BASIC_AUTH_USERNAME=${USERNAME}
       - CW_BASIC_AUTH_PASSWORD=${PASSWORD}
     networks:
@@ -87,9 +60,9 @@ services:
     command: ["/usr/local/bin/backup.sh"]
     depends_on:
       - cron
-      - mongo-rs-1
+      - ferretdb
     environment:
-      - MONGO_URI=mongodb://${USERNAME}:${PASSWORD}@mongo-rs-1:27017/?replicaSet=rs0&authSource=admin
+      - MONGO_URI=mongodb://${USERNAME}:${PASSWORD}@ferretdb:27017/?authMechanism=PLAIN
       - GCS_BUCKET=${GCS_BUCKET}
       - GCS_SA_KEY_BASE64=${GCS_SA_KEY_BASE64}
       - GCS_FOLDER=gc-mongo-weekly
@@ -131,8 +104,6 @@ services:
 
   grafana:
     image: ghcr.io/${OWNER_NAME}/grafana:${GIT_COMMIT_SHA}
-    links:
-      - mongo-rs-1
     volumes:
       - grafana-data:/var/lib/grafana
     environment:
@@ -182,10 +153,6 @@ services:
 
   loki-init:
     image: alpine:3.21
-    # Loki runs as uid 10001 but docker creates the loki-data volume as root,
-    # and the loki image is distroless so it cannot fix that itself. This
-    # one-shot task prepares the data directories on every deploy. Same idea
-    # as mongo-rs-init above.
     command:
       - sh
       - -c
@@ -412,7 +379,6 @@ networks:
       encrypted: "true"
 
 volumes:
-  mongodb-rs-1-data:
   grafana-data:
   caddy-data:
   mqtt-data:

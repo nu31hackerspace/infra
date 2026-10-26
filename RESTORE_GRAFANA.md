@@ -2,7 +2,7 @@
 
 Based on the analysis of your `infra` project, here is how your Grafana backup and restore process works.
 
-Your Grafana setup uses Docker Swarm. The stack is deployed as `infra` (as seen in `local_deploy.js`), so your Docker volume for Grafana is named **`infra_grafana-data`** (fixing the slight typo from `infra_grafan-data`).
+Your Grafana setup uses Docker Swarm. The stack is deployed as `infra`, so your Docker volume for Grafana is named **`infra_grafana-data`** (fixing the slight typo from `infra_grafan-data`).
 
 Additionally, looking at the `grafana-backup/backup.sh` script, it specifically backs up the `/var/lib/grafana/grafana.db` file. Your `grafana.tar` (or `.tar.gz`) file contains this `grafana.db` file.
 

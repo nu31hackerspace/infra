@@ -4,6 +4,16 @@ The document for keep the track of all changes for the NU31 infrastructure.
 
 ## 25.10.2026
 
+Replace the `mongo-rs-1` replica set with FerretDB 1.24 (`ferretdb` service) on top of
+Azure Database for PostgreSQL. All mongo databases live as schemas in the postgres
+database `ferretdb`. Clients connect to `ferretdb:27017` with `authMechanism=PLAIN` and
+without `replicaSet`. `mongo-rs-init`, the `MONGO_RS_KEYFILE_CONTENT` secret and the
+`mongodb-rs-1-data` volume are no longer used. The viewer and the weekly mongodump backup
+point to ferretdb.
+
+Remove the local stack `docker-stack.local.yml` and its deploy script `local_deploy.js`.
+
+
 Move PostgreSQL data to Azure Database for PostgreSQL (`main.postgres.database.azure.com`).
 
 `mqtt-logger` and the Grafana `MQTT history` datasource connect to Azure over TLS.

@@ -21,7 +21,6 @@ env:
   PGWEB_OAUTH2_COOKIE_SECRET: ${{ secrets.PGWEB_OAUTH2_COOKIE_SECRET }}
 
   ROOT_SSH_PRIVATE_KEY: ${{ secrets.ROOT_SSH_PRIVATE_KEY }}
-  MONGO_RS_KEYFILE_CONTENT: ${{ secrets.MONGO_RS_KEYFILE_CONTENT }}
 
   GCS_BUCKET: ${{ vars.GCS_BUCKET }}
   GCS_SA_KEY_BASE64: ${{ secrets.GCS_SA_KEY_BASE64 }}
@@ -53,7 +52,6 @@ jobs:
           write_var GIT_COMMIT_SHA
           write_var USERNAME
           write_var PASSWORD
-          write_var MONGO_RS_KEYFILE_CONTENT
           write_var GCS_BUCKET
           write_var GCS_SA_KEY_BASE64
           write_var MQTT_TLS_DOMAIN

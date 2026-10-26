@@ -54,7 +54,7 @@ wait_for_mongo() {
 }
 
 # One collection and one insert worker at a time: big collections (gridfs
-# chunks) restored in parallel push mongod out of memory on a small VPS, which
+# chunks) restored in parallel push the database out of memory on a small VPS, which
 # shows up as "connection reset by peer". --drop makes a rerun replace what a
 # failed attempt already wrote, so retrying is safe.
 MAX_ATTEMPTS=3
@@ -75,5 +75,5 @@ for attempt in $(seq 1 "${MAX_ATTEMPTS}"); do
   sleep 10
 done
 
-echo "[!] Restore failed after ${MAX_ATTEMPTS} attempts, check: docker service ps infra_mongo-rs-1 --no-trunc"
+echo "[!] Restore failed after ${MAX_ATTEMPTS} attempts, check: docker service logs infra_ferretdb"
 exit 1

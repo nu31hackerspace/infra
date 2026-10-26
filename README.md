@@ -32,13 +32,21 @@ The project provides **caddy** as reverse proxy for handle SSL key generation an
 MongoDB is my database of choice. I believe it's the only data store which you need to build the project.
 I use the mongodb bucket for BLOB store, it make local infracture easy to handle, and the API for mongo bucket easy to work compare to S3 buckets.
 
-MongoDB run in replica set with one node, the solution allow to use all mongo replica set feature as watch the collection.
+In production the MongoDB API is served by [FerretDB 1.24](https://docs.ferretdb.io/v1.24/understanding-ferretdb/)
+(`ferretdb` service) with Azure Database for PostgreSQL as storage. FerretDB keeps everything in one
+postgres database `ferretdb` (create it once in Azure): every mongo database is a postgres **schema**,
+every collection is a **table**, every document a `jsonb` row. No new postgres database is created per
+mongo database.
 
-Generate key for replica set (execute on server mathine)
+FerretDB has no users of its own, it forwards the client credentials to postgres. Connect with the
+postgres user and the `PLAIN` mechanism, from a service joined to `infra_mongo-rs-net`:
 
-```sh
-openssl rand -base64 756 | docker secret create mongodb-keyfile -
 ```
+mongodb://<USERNAME>:<PASSWORD>@ferretdb:27017/<db>?authMechanism=PLAIN
+```
+
+FerretDB is not a replica set: drop `replicaSet=rs0` from connection strings, change streams
+(`watch`) and transactions are not available.
 
 ### Logs
 
@@ -53,7 +61,7 @@ Two services do the job:
 - **loki** (`grafana/loki`) stores the logs on the `loki-data` volume. It is a single
   node, filesystem backed setup, no object storage, no clustering. Config:
   `loki/loki-config.yml`.
-- **loki-init** is a one-shot task (like `mongo-rs-init`) that prepares the data
+- **loki-init** is a one-shot task that prepares the data
   directories on the `loki-data` volume for uid `10001`. The loki image is
   distroless and cannot chown its own volume.
 
@@ -133,7 +141,7 @@ The stack has to be deployed first.
 
 | target   | what happens                                                                          |
 | -------- | ------------------------------------------------------------------------------------- |
-| mongo    | `mongorestore --drop` of the archive, collections in the backup are replaced          |
+| mongo    | `mongorestore --drop` of the archive into ferretdb, collections in the backup are replaced |
 
 PostgreSQL is not backed up by the stack, the data lives in Azure Database for PostgreSQL,
 which keeps its own backups.
@@ -159,101 +167,6 @@ will build the same set of images successfully.
 For more details, take a look at [project github action](https://github.com/VovaStelmashchuk/infra/tree/main/.github/workflows)
 
 You can find all required environment variables and secrets for the project in the github action job `Create env file`. Also some secrets are provided as docker secrets, but I have been trying to get rid of docker secrets in the project.
-
-## Local development
-
-For local infrastructure use file `docker-stack.local.yml` - the file setup only mongo and mongo viewer
-
-The setup is tested only for MacOS with `colima`
-
-1. Start colima by command
-
-In case `qemu` is not installed on your machine, install it by command `brew install qemu`
-
-```bash
-colima start --network-address
-```
-
-2. Verify colima status
-
-```bash
-colima status
-```
-
-The command will return information about colima virtual machine, look to the line `INFO[0000] address:`
-Use the colima VM IP address to start the docker stack
-
-```bash
-docker swarm init --advertise-addr <IP address from the colima status command>
-```
-
-3. Run docker stack
-
-```bash
-docker stack deploy -c docker-stack.local.yml infra
-```
-
-The command will start the mongodb at port 27017 and mongo viewer on port 5000 into colima VM.
-
-Open http://<colima ip>:5000 to browse the mongo db.
-
-4. (Optional) Apply backup/snapshot of mongodb to your local environment
-
-Copy mongo backup file into docker container
-
-```bash
-docker cp /path/to/backup/test.archive mongo:/test.archive
-```
-
-Restore mongo from backup
-
-```bash
-docker exec -it <mongo container> mongorestore --uri mongodb://localhost:27017 --gzip --archive=test.archive
-```
-
-### Restore database from backup
-
-```
-mongorestore \
-  --host 167.235.52.168 \
-  --port 2017 \
-  --username <root_user_name> \
-  --password '<pass for root>' \
-  --authenticationDatabase admin \
-  --drop \
-  --gzip \
-  --archive=backup-15-00.gz
-```
-
-### Local mongo, restore from any backup file
-
-```
-mongorestore --uri="mongodb://0.0.0.0:27017/" --drop --gzip --db=mixdrinks --archive=hourly_mongodump-2025-05-29_13-00.gz
-```
-
-## Local infrastructure
-
-For the local infrastructure use the `docker-stack.local.yml`. This stack sets up a MongoDB Replica Set environment useful for local testing.
-
-### Services
-
-- **mongo-rs-1**: The primary MongoDB service running version 8.2.3.
-- **mongo-rs-init**: An oversized ephemeral container that waits for `mongo-rs-1` to be ready and initializes the Replica Set (`rs0`).
-- **mongo-rs-viewer**: A web-based MongoDB viewer (`haohanyang/compass-web`) exposed on port **5001**.
-
-### Usage
-
-To deploy the local stack:
-
-Add `192.168.64.2 mongo-rs-1` into `/etc/hosts` file
-
-```sh
-node local_deploy.js
-```
-
-Once deployed, you can access the MongoDB viewer at `http://<colima_ip>:5000`.
-Credentials for the viewer can be set in your environment variables (`USERNAME`, `PASSWORD`) or will default if not specified in the stack file (check `docker-stack.local.yml` for variable usage).
-
 
 ### Grafana backup restore
 
