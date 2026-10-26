@@ -55,29 +55,6 @@ services:
       restart_policy:
         condition: on-failure
 
-  mongo-rs-backup-weekly:
-    image: ghcr.io/${OWNER_NAME}/mongo-rs-backup:${GIT_COMMIT_SHA}
-    command: ["/usr/local/bin/backup.sh"]
-    depends_on:
-      - cron
-      - ferretdb
-    environment:
-      - MONGO_URI=mongodb://${USERNAME}:${PASSWORD}@ferretdb:27017/?authMechanism=PLAIN
-      - GCS_BUCKET=${GCS_BUCKET}
-      - GCS_SA_KEY_BASE64=${GCS_SA_KEY_BASE64}
-      - GCS_FOLDER=gc-mongo-weekly
-    networks:
-      - mongo-rs-net
-    deploy:
-      mode: replicated
-      replicas: 0
-      labels:
-        - "swarm.cronjob.enable=true"
-        - "swarm.cronjob.schedule=20 3 * * 2"
-        - "swarm.cronjob.skip-running=true"
-      restart_policy:
-        condition: none
-
   caddy:
     image: ghcr.io/${OWNER_NAME}/caddy:${GIT_COMMIT_SHA}
     dns:

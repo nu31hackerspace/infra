@@ -30,9 +30,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: mongo-rs-backup
-            context: ./mongo-rs-backup
-            image: mongo-rs-backup
           - name: caddy
             context: ./caddy
             image: caddy
