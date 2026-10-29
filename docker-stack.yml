@@ -83,9 +83,7 @@ services:
     hostname: "{{.Node.Hostname}}"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /:/rootfs:ro
       - /sys:/sys:ro
-      - /var/lib/docker:/var/lib/docker:ro
       - alloy-data:/var/lib/alloy/data
     environment:
       - TZ=UTC

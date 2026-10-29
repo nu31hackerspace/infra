@@ -90,6 +90,10 @@ prometheus.exporter.cadvisor "docker" {
   docker_host            = "unix:///var/run/docker.sock"
   store_container_labels = true
   docker_only            = true
+  // Only collect in-memory cgroup stats (CPU, memory, network).
+  // Disables the "disk" collector which otherwise walks /var/lib/docker/overlay2
+  // and causes multi-GB disk reads.
+  enabled_metrics        = ["cpu", "memory", "network"]
 }
 
 prometheus.scrape "containers" {
@@ -105,7 +109,7 @@ prometheus.relabel "containers" {
   // Grafana Cloud active series limits.
   rule {
     source_labels = ["__name__"]
-    regex         = "container_cpu_usage_seconds_total|container_memory_working_set_bytes|container_spec_memory_limit_bytes|container_network_(receive|transmit)_bytes_total|container_fs_(reads|writes)_bytes_total|container_last_seen"
+    regex         = "container_cpu_usage_seconds_total|container_memory_working_set_bytes|container_spec_memory_limit_bytes|container_network_(receive|transmit)_bytes_total|container_last_seen"
     action        = "keep"
   }
 

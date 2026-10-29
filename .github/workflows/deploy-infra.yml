@@ -72,4 +72,5 @@ jobs:
           user: ${{ env.USERNAME }}
           ssh_key: ${{ env.ROOT_SSH_PRIVATE_KEY }}
           env_file: ./envfile
+          prune: true
 
