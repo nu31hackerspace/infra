@@ -48,40 +48,19 @@ mongodb://<USERNAME>:<PASSWORD>@ferretdb:27017/<db>?authMechanism=PLAIN
 FerretDB is not a replica set: drop `replicaSet=rs0` from connection strings, change streams
 (`watch`) and transactions are not available.
 
-### Logs
+### Logs & Container Metrics
 
-All container logs of the swarm are collected and browsable in Grafana, so there is
-no need to ssh into the VPS and run `docker service logs` anymore.
+All container logs and per-container resource metrics (CPU, memory, network, disk I/O) of the swarm are collected by **Grafana Alloy** (`alloy/config.alloy`) and shipped directly to **Grafana Cloud** (Loki + Prometheus):
 
-Two services do the job:
+- **alloy** (`grafana/alloy`) runs in `global` mode (one instance per swarm node).
+  - Streams container stdout/stderr from the Docker API to Grafana Cloud Loki (`GRAFANA_LOKI_URL`).
+  - Exposes per-container cAdvisor metrics and remote-writes the essential container resource metrics to Grafana Cloud Prometheus (`GRAFANA_PROMETHEUS_URL`).
 
-- **alloy** (`grafana/alloy`) runs in `global` mode, so one instance per swarm node.
-  It reads the Docker API, discovers every running container on its node and streams
-  the container stdout/stderr to Loki. Config: `alloy/config.alloy`.
-- **loki** (`grafana/loki`) stores the logs on the `loki-data` volume. It is a single
-  node, filesystem backed setup, no object storage, no clustering. Config:
-  `loki/loki-config.yml`.
-- **loki-init** is a one-shot task that prepares the data
-  directories on the `loki-data` volume for uid `10001`. The loki image is
-  distroless and cannot chown its own volume.
-
-Both live on the private `logs-net` overlay network together with Grafana. Loki is
-**not** published through Caddy, the only way to read the logs is Grafana.
-
-#### How to look at the logs
-
-Open [grafana.nu31.space](https://grafana.nu31.space) and either:
-
-- use the dashboard **Infra / Service logs** (provisioned from
-  `grafana/dashboards/service-logs.json`) - pick a stack, a service and a node,
-  optionally type a regex into the search box, or
-- use **Explore** with the `Loki` datasource and write LogQL by hand.
-
-Useful queries:
+#### Useful LogQL queries in Grafana Cloud
 
 ```logql
 # everything of one service
-{service="infra_grafana"}
+{service="infra_caddy"}
 
 # everything of the infra stack, only the lines containing "error"
 {stack="infra"} |~ "(?i)error"
@@ -90,24 +69,13 @@ Useful queries:
 sum by (service) (rate({stack="infra"}[5m]))
 ```
 
-Every log line carries three labels:
+Every log line and container metric carries three labels:
 
 | label     | meaning                                                            |
 | --------- | ------------------------------------------------------------------ |
-| `service` | swarm service name (`infra_grafana`), or container name if not swarm |
+| `service` | swarm service name (`infra_caddy`), or container name if not swarm |
 | `stack`   | stack the service belongs to (`infra`, `nu31space`, ...)            |
 | `node`    | swarm node the container runs on                                    |
-
-The label set is kept small on purpose: each unique combination is a separate stream
-in Loki, and high cardinality labels (container id, request id, ...) are what makes
-Loki slow and expensive. Everything else stays in the log line and can be filtered
-with `|=` / `|~`.
-
-#### Retention
-
-Logs are kept **30 days** and then deleted by the Loki compactor, see
-`retention_period` in `loki/loki-config.yml`. Logs are not backed up to GCS - they
-are debugging material, not data we need to restore.
 
 ### Periodic tasks
 
@@ -167,27 +135,6 @@ will build the same set of images successfully.
 For more details, take a look at [project github action](https://github.com/VovaStelmashchuk/infra/tree/main/.github/workflows)
 
 You can find all required environment variables and secrets for the project in the github action job `Create env file`. Also some secrets are provided as docker secrets, but I have been trying to get rid of docker secrets in the project.
-
-### Grafana backup restore
-
-```sh
-docker service scale infra_grafana=0
-```
-
-```sh
-docker run --rm \
-  -v infra_grafana-data:/data \
-  -v "$(pwd)":/backup \
-  alpine \
-  sh -c "cp /backup/grafana.db /data/grafana.db"
-```
-
-```sh
-docker run --rm \
-  -v infra_grafana-data:/data \
-  alpine \
-  chown 472:472 /data/grafana.db
-```
 
 To create own infrastructure setup, fork the repository and update all need github action secrets and variables.
 

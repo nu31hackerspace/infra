@@ -16,14 +16,16 @@ env:
 
   MQTT_TLS_DOMAIN: mqtt.nu31.space
 
-  PGWEB_GITHUB_CLIENT_ID: ${{ secrets.PGWEB_GITHUB_CLIENT_ID }}
-  PGWEB_GITHUB_CLIENT_SECRET: ${{ secrets.PGWEB_GITHUB_CLIENT_SECRET }}
-  PGWEB_OAUTH2_COOKIE_SECRET: ${{ secrets.PGWEB_OAUTH2_COOKIE_SECRET }}
-
   ROOT_SSH_PRIVATE_KEY: ${{ secrets.ROOT_SSH_PRIVATE_KEY }}
 
   GCS_BUCKET: ${{ vars.GCS_BUCKET }}
   GCS_SA_KEY_BASE64: ${{ secrets.GCS_SA_KEY_BASE64 }}
+
+  GRAFANA_LOKI_URL: ${{ vars.GRAFANA_LOKI_URL }}
+  GRAFANA_LOKI_USER: ${{ vars.GRAFANA_LOKI_USER }}
+  GRAFANA_PROMETHEUS_URL: ${{ vars.GRAFANA_PROMETHEUS_URL }}
+  GRAFANA_PROMETHEUS_USER: ${{ vars.GRAFANA_PROMETHEUS_USER }}
+  GRAFANA_API_KEY: ${{ secrets.GRAFANA_API_KEY }}
 
 jobs:
   # The image list lives in build-images.yml, shared with the pull request
@@ -55,9 +57,11 @@ jobs:
           write_var GCS_BUCKET
           write_var GCS_SA_KEY_BASE64
           write_var MQTT_TLS_DOMAIN
-          write_var PGWEB_GITHUB_CLIENT_ID
-          write_var PGWEB_GITHUB_CLIENT_SECRET
-          write_var PGWEB_OAUTH2_COOKIE_SECRET
+          write_var GRAFANA_LOKI_URL
+          write_var GRAFANA_LOKI_USER
+          write_var GRAFANA_PROMETHEUS_URL
+          write_var GRAFANA_PROMETHEUS_USER
+          write_var GRAFANA_API_KEY
 
       - name: Docker Stack Deploy
         uses: cssnr/stack-deploy-action@v1

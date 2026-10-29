@@ -33,16 +33,8 @@ http://www.nu31.space {
         redir https://nu31.space{uri} permanent
 }
 
-http://grafana.nu31.space {
-        reverse_proxy * infra_grafana:3000
-}
-
 http://compass.nu31.space {
         reverse_proxy * infra_mongo-rs-viewer:8080
-}
-
-http://pgweb.nu31.space {
-        reverse_proxy * postgres-viewer:80
 }
 
 http://wiki.nu31.space {

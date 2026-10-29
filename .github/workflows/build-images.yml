@@ -33,15 +33,6 @@ jobs:
           - name: caddy
             context: ./caddy
             image: caddy
-          - name: grafana
-            context: ./grafana
-            image: grafana
-          - name: grafana-backup
-            context: ./grafana-backup
-            image: grafana-backup
-          - name: loki
-            context: ./loki
-            image: loki
           - name: alloy
             context: ./alloy
             image: alloy

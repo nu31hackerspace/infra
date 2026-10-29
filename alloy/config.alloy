@@ -1,6 +1,10 @@
-// Grafana Alloy ships the stdout/stderr of every container running on this
-// node to Loki. It is deployed in global mode, so one instance runs per swarm
-// node and together they cover the whole cluster.
+// Grafana Alloy ships the stdout/stderr and resource metrics of every
+// container running on this node to Grafana Cloud (Loki + Prometheus).
+// Deployed in global mode so one instance runs per Swarm node.
+
+// ---------------------------------------------------------
+// Container Logs -> Grafana Cloud Loki
+// ---------------------------------------------------------
 
 // Discover every running container on this node through the Docker API.
 discovery.docker "containers" {
@@ -14,8 +18,7 @@ discovery.docker "containers" {
 }
 
 // Turn Docker/Swarm metadata into the labels we query by in Grafana.
-// Labels are kept deliberately few: every unique combination is a separate
-// stream in Loki, and high cardinality is what makes Loki slow and fat.
+// Labels are kept deliberately few to avoid high cardinality in Loki.
 discovery.relabel "containers" {
   targets = discovery.docker.containers.targets
 
@@ -28,7 +31,7 @@ discovery.relabel "containers" {
   }
 
   // For swarm managed containers the service name is the useful identity
-  // (infra_grafana, infra_caddy, ...). Only overwrites when the label exists.
+  // (infra_caddy, infra_mqtt, ...). Only overwrites when the label exists.
   rule {
     source_labels = ["__meta_docker_container_label_com_docker_swarm_service_name"]
     regex         = "(.+)"
@@ -59,7 +62,7 @@ loki.source.docker "containers" {
 }
 
 loki.process "containers" {
-  forward_to = [loki.write.loki.receiver]
+  forward_to = [loki.write.grafana_cloud.receiver]
 
   // Drop the empty lines many images print on startup, they are pure noise
   // in the log panel.
@@ -68,43 +71,76 @@ loki.process "containers" {
   }
 }
 
-loki.write "loki" {
+loki.write "grafana_cloud" {
   endpoint {
-    url = "http://loki:3100/loki/api/v1/push"
+    url = sys.env("GRAFANA_LOKI_URL")
+
+    basic_auth {
+      username = sys.env("GRAFANA_LOKI_USER")
+      password = sys.env("GRAFANA_API_KEY")
+    }
   }
 }
 
 // ---------------------------------------------------------
-// Metrics Collection
+// Container Resource Metrics -> Grafana Cloud Prometheus
 // ---------------------------------------------------------
 
-// 1. Configure the Unix/Node Exporter for host metrics
-prometheus.exporter.unix "host" {
-  procfs_path = "/host/proc"
-  sysfs_path  = "/host/sys"
-  rootfs_path = "/rootfs"
-}
-
-// 2. Configure the cAdvisor Exporter for container metrics
 prometheus.exporter.cadvisor "docker" {
-  docker_host = "unix:///var/run/docker.sock"
+  docker_host            = "unix:///var/run/docker.sock"
   store_container_labels = true
+  docker_only            = true
 }
 
-// 3. Scrape both exporters
-prometheus.scrape "metrics" {
-  targets = concat(
-    prometheus.exporter.unix.host.targets,
-    prometheus.exporter.cadvisor.docker.targets,
-  )
-
-  forward_to      = [prometheus.remote_write.default.receiver]
-  scrape_interval = "15s"
+prometheus.scrape "containers" {
+  targets         = prometheus.exporter.cadvisor.docker.targets
+  forward_to      = [prometheus.relabel.containers.receiver]
+  scrape_interval = "60s"
 }
 
-// 4. Send the metrics to Prometheus
-prometheus.remote_write "default" {
+prometheus.relabel "containers" {
+  forward_to = [prometheus.remote_write.grafana_cloud.receiver]
+
+  // Keep only the essential per-container resource metrics to stay well within
+  // Grafana Cloud active series limits.
+  rule {
+    source_labels = ["__name__"]
+    regex         = "container_cpu_usage_seconds_total|container_memory_working_set_bytes|container_spec_memory_limit_bytes|container_network_(receive|transmit)_bytes_total|container_fs_(reads|writes)_bytes_total|container_last_seen"
+    action        = "keep"
+  }
+
+  // Map Swarm labels to friendly `service`, `stack`, and `node` labels matching Loki.
+  rule {
+    source_labels = ["name"]
+    regex         = "(.+)"
+    target_label  = "service"
+  }
+
+  rule {
+    source_labels = ["container_label_com_docker_swarm_service_name"]
+    regex         = "(.+)"
+    target_label  = "service"
+  }
+
+  rule {
+    source_labels = ["container_label_com_docker_stack_namespace"]
+    regex         = "(.+)"
+    target_label  = "stack"
+  }
+
+  rule {
+    target_label = "node"
+    replacement  = constants.hostname
+  }
+}
+
+prometheus.remote_write "grafana_cloud" {
   endpoint {
-    url = "http://prometheus:9090/api/v1/write"
+    url = sys.env("GRAFANA_PROMETHEUS_URL")
+
+    basic_auth {
+      username = sys.env("GRAFANA_PROMETHEUS_USER")
+      password = sys.env("GRAFANA_API_KEY")
+    }
   }
 }
