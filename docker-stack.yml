@@ -83,6 +83,7 @@ services:
     hostname: "{{.Node.Hostname}}"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /run/containerd/containerd.sock:/run/containerd/containerd.sock:ro
       - /sys:/sys:ro
       - alloy-data:/var/lib/alloy/data
     environment:
