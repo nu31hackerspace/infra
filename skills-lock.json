@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "mqttx-cli": {
+      "source": "emqx/MQTTX",
+      "sourceType": "github",
+      "skillPath": "skills/mqttx-cli/SKILL.md",
+      "computedHash": "5798037031868bb81503eec826c6a6c3c2aa288fe6f0a9fa700792111b1764c7"
+    }
+  }
+}

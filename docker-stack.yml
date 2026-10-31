@@ -78,8 +78,6 @@ services:
 
   alloy:
     image: ghcr.io/${OWNER_NAME}/alloy:${GIT_COMMIT_SHA}
-    # Collects container logs and cAdvisor resource metrics on the node and
-    # pushes them to Grafana Cloud (Loki + Prometheus).
     hostname: "{{.Node.Hostname}}"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -112,8 +110,6 @@ services:
     volumes:
       - mqtt-data:/mosquitto/data
       - mqtt-log:/mosquitto/log
-      # caddy-data mounted read-only so the entrypoint can read the TLS cert that
-      # Caddy provisions and renews for MQTT_TLS_DOMAIN.
       - caddy-data:/caddy_storage:ro
     environment:
       - MQTT_PORT=1883
@@ -135,7 +131,7 @@ services:
         failure_action: rollback
       resources:
         limits:
-          memory: 256M
+          memory: 512M
 
   mqtt-logger:
     image: ghcr.io/${OWNER_NAME}/mqtt-logger:${GIT_COMMIT_SHA}
@@ -145,8 +141,6 @@ services:
       - MQTT_URL=mqtt://mqtt:1883
       - MQTT_USER=${USERNAME}
       - MQTT_PASSWORD=${PASSWORD}
-      # Azure Database for PostgreSQL. node-postgres reads PGSSLMODE, verify-full
-      # checks the certificate against the system CAs, no CA file needed.
       - PGHOST=main.postgres.database.azure.com
       - PGPORT=5432
       - PGSSLMODE=verify-full
