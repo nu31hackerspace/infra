@@ -11,11 +11,6 @@ updates:
       interval: "weekly"
 
   - package-ecosystem: "docker"
-    directory: "/alloy"
-    schedule:
-      interval: "weekly"
-
-  - package-ecosystem: "docker"
     directory: "/mqtt"
     schedule:
       interval: "weekly"

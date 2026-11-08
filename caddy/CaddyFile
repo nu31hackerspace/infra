@@ -33,10 +33,6 @@ http://www.nu31.space {
         redir https://nu31.space{uri} permanent
 }
 
-http://compass.nu31.space {
-        reverse_proxy * infra_mongo-rs-viewer:8080
-}
-
 http://logs.nu31.space {
         reverse_proxy * infra_dozzle:8080
 }

@@ -24,35 +24,6 @@ services:
       restart_policy:
         condition: none
 
-  ferretdb:
-    image: ghcr.io/ferretdb/ferretdb:1.24.0
-    environment:
-      - FERRETDB_POSTGRESQL_URL=postgres://${USERNAME}:${PASSWORD}@main.postgres.database.azure.com:5432/ferretdb?sslmode=require
-    networks:
-      - mongo-rs-net
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-      resources:
-        limits:
-          memory: 512M
-
-  mongo-rs-viewer:
-    image: haohanyang/compass-web:0.5.0
-    depends_on:
-      - ferretdb
-    environment:
-      - CW_MONGO_URI=mongodb://${USERNAME}:${PASSWORD}@ferretdb:27017/?authMechanism=PLAIN
-      - CW_BASIC_AUTH_USERNAME=${USERNAME}
-      - CW_BASIC_AUTH_PASSWORD=${PASSWORD}
-    networks:
-      - mongo-rs-net
-      - reverse-proxy
-    deploy:
-      restart_policy:
-        condition: on-failure
-
   caddy:
     image: ghcr.io/${OWNER_NAME}/caddy:${GIT_COMMIT_SHA}
     dns:
@@ -75,28 +46,6 @@ services:
         condition: on-failure
     networks:
       - reverse-proxy
-
-  alloy:
-    image: ghcr.io/${OWNER_NAME}/alloy:${GIT_COMMIT_SHA}
-    hostname: "{{.Node.Hostname}}"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /run/containerd/containerd.sock:/run/containerd/containerd.sock:ro
-      - /sys:/sys:ro
-      - alloy-data:/var/lib/alloy/data
-    environment:
-      - TZ=UTC
-      - GRAFANA_PROMETHEUS_URL=${GRAFANA_PROMETHEUS_URL}
-      - GRAFANA_PROMETHEUS_USER=${GRAFANA_PROMETHEUS_USER}
-      - GRAFANA_API_KEY=${GRAFANA_API_KEY}
-    deploy:
-      mode: global
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-      resources:
-        limits:
-          memory: 512M
 
   # Live log viewer for every container of the swarm, served at logs.nu31.space.
   # Global mode: one instance per node, the instances find each other over
@@ -235,11 +184,6 @@ networks:
   reverse-proxy:
     driver: overlay
     attachable: true
-  mongo-rs-net:
-    driver: overlay
-    attachable: true
-    driver_opts:
-      encrypted: "true"
   mqtt-net:
     driver: overlay
     attachable: true
@@ -252,7 +196,6 @@ volumes:
   caddy-data:
   mqtt-data:
   mqtt-log:
-  alloy-data:
   dozzle-data:
 
 secrets:

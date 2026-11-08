@@ -18,7 +18,6 @@ The infrastructure includes the following:
 - Docker Swarm
 - Postgress
 - Caddy reverse proxy
-- Container metrics in Grafana Cloud (Grafana Alloy)
 - Live logs for every container ([Dozzle](https://github.com/amir20/dozzle))
 
 ## Infrastructure components
@@ -29,24 +28,8 @@ The project provides **caddy** as reverse proxy for handle SSL key generation an
 
 ### Database
 
-MongoDB is my database of choice. I believe it's the only data store which you need to build the project.
-I use the mongodb bucket for BLOB store, it make local infracture easy to handle, and the API for mongo bucket easy to work compare to S3 buckets.
-
-In production the MongoDB API is served by [FerretDB 1.24](https://docs.ferretdb.io/v1.24/understanding-ferretdb/)
-(`ferretdb` service) with Azure Database for PostgreSQL as storage. FerretDB keeps everything in one
-postgres database `ferretdb` (create it once in Azure): every mongo database is a postgres **schema**,
-every collection is a **table**, every document a `jsonb` row. No new postgres database is created per
-mongo database.
-
-FerretDB has no users of its own, it forwards the client credentials to postgres. Connect with the
-postgres user and the `PLAIN` mechanism, from a service joined to `infra_mongo-rs-net`:
-
-```
-mongodb://<USERNAME>:<PASSWORD>@ferretdb:27017/<db>?authMechanism=PLAIN
-```
-
-FerretDB is not a replica set: drop `replicaSet=rs0` from connection strings, change streams
-(`watch`) and transactions are not available.
+PostgreSQL lives in Azure Database for PostgreSQL (`main.postgres.database.azure.com`), outside
+the stack. Services connect to it directly with the shared `USERNAME` + `PASSWORD`.
 
 ### Logs
 
@@ -63,57 +46,21 @@ on the node.
   Secrets are immutable, so each deploy creates a new one; old ones can be removed with
   `docker secret ls` / `docker secret rm` (secrets in use are refused).
 
-### Container Metrics
-
-Per-container resource metrics (CPU, memory, network) are collected by **Grafana Alloy**
-(`alloy/config.alloy`, `global` mode, one instance per node) from cAdvisor and remote-written to
-**Grafana Cloud Prometheus** (`GRAFANA_PROMETHEUS_URL`). Every series carries three labels:
-
-| label     | meaning                                                            |
-| --------- | ------------------------------------------------------------------ |
-| `service` | swarm service name (`infra_caddy`), or container name if not swarm |
-| `stack`   | stack the service belongs to (`infra`, `nu31space`, ...)            |
-| `node`    | swarm node the container runs on                                    |
-
 ### Periodic tasks
 
-The `infra` stack has the cron executor `crazymax/swarm-cronjob` which is used for periodic backup database and caddy config
+The `infra` stack has the cron executor `crazymax/swarm-cronjob` which runs the periodic MQTT backup and the hourly `docker system prune`
 
 ### Backups
 
-The project provides periodic backups for mongo and caddy config.
-The Database backups each hour, each day, and each week, all backups are stored in a Google Cloud Storage bucket.
+The MQTT broker data (`mqtt-data` volume) is backed up every day to a Google Cloud Storage bucket
+(`mqtt-backup-daily`). Restore steps are in `RESTORE_MQTT.md`.
 
 Backups authenticate with a Google Cloud service account that has the `Storage Object Admin` role on the bucket. Provide its credentials to the deploy as:
 
 - `vars.GCS_BUCKET` — the destination bucket name (no `gs://` prefix).
 - `secrets.GCS_SA_KEY_BASE64` — the service account JSON key, base64-encoded (e.g. `base64 -w0 key.json`).
 
-### Restore
-
-Restoring mongo is part of the infrastructure too: run the **Restore from backup**
-GitHub action (`.github/workflows/restore-backup.yml`) by hand. Inputs:
-
-- `target` - `mongo-weekly`
-- `backup_file` - `latest`, a file name in the target's bucket folder
-  (`mongodump-2026-10-20_03-20.gz`) or a full `gs://` url
-- `confirm` - the target typed again, the current data is replaced
-
-The mongo backup image ships a `restore.sh` next to its `backup.sh`. The action
-ssh-es to `HOST` and runs `scripts/restore-on-host.sh`, which starts a one-off container from
-the image of the deployed backup service with that service's env, network and volumes. So the
-restore reads the same bucket folder with the same credentials, and no secret leaves GitHub.
-The stack has to be deployed first.
-
-| target   | what happens                                                                          |
-| -------- | ------------------------------------------------------------------------------------- |
-| mongo    | `mongorestore --drop` of the archive into ferretdb, collections in the backup are replaced |
-
-PostgreSQL is not backed up by the stack, the data lives in Azure Database for PostgreSQL,
-which keeps its own backups.
-
-Moving to a new VPS: run **Setup VPS**, deploy the stack, then restore each target. The manual
-steps are kept in `RESTORE_MONGO.md`.
+PostgreSQL is not backed up by the stack, Azure Database for PostgreSQL keeps its own backups.
 
 ## Build & deploy
 

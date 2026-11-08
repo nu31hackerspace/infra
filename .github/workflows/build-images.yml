@@ -33,9 +33,6 @@ jobs:
           - name: caddy
             context: ./caddy
             image: caddy
-          - name: alloy
-            context: ./alloy
-            image: alloy
           - name: mqtt
             context: ./mqtt
             image: mqtt
