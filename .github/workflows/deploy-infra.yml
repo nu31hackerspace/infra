@@ -21,8 +21,6 @@ env:
   GCS_BUCKET: ${{ vars.GCS_BUCKET }}
   GCS_SA_KEY_BASE64: ${{ secrets.GCS_SA_KEY_BASE64 }}
 
-  GRAFANA_LOKI_URL: ${{ vars.GRAFANA_LOKI_URL }}
-  GRAFANA_LOKI_USER: ${{ vars.GRAFANA_LOKI_USER }}
   GRAFANA_PROMETHEUS_URL: ${{ vars.GRAFANA_PROMETHEUS_URL }}
   GRAFANA_PROMETHEUS_USER: ${{ vars.GRAFANA_PROMETHEUS_USER }}
   GRAFANA_API_KEY: ${{ secrets.GRAFANA_API_KEY }}
@@ -57,11 +55,18 @@ jobs:
           write_var GCS_BUCKET
           write_var GCS_SA_KEY_BASE64
           write_var MQTT_TLS_DOMAIN
-          write_var GRAFANA_LOKI_URL
-          write_var GRAFANA_LOKI_USER
           write_var GRAFANA_PROMETHEUS_URL
           write_var GRAFANA_PROMETHEUS_USER
           write_var GRAFANA_API_KEY
+
+      # Dozzle login: one user, the shared USERNAME + PASSWORD. The password is
+      # piped through stdin so it never shows up in the process list.
+      - name: Generate Dozzle users file
+        run: |
+          printf '%s' "$PASSWORD" \
+            | docker run -i --rm amir20/dozzle:v11.4.1 generate "$USERNAME" \
+            > ./dozzle-users.yml
+          grep -q "$USERNAME" ./dozzle-users.yml
 
       - name: Docker Stack Deploy
         uses: cssnr/stack-deploy-action@v1

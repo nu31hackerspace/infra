@@ -18,8 +18,8 @@ The infrastructure includes the following:
 - Docker Swarm
 - Postgress
 - Caddy reverse proxy
-- Grafana
-- Centralized logs for every container (Loki + Grafana Alloy)
+- Container metrics in Grafana Cloud (Grafana Alloy)
+- Live logs for every container ([Dozzle](https://github.com/amir20/dozzle))
 
 ## Infrastructure components
 
@@ -48,28 +48,26 @@ mongodb://<USERNAME>:<PASSWORD>@ferretdb:27017/<db>?authMechanism=PLAIN
 FerretDB is not a replica set: drop `replicaSet=rs0` from connection strings, change streams
 (`watch`) and transactions are not available.
 
-### Logs & Container Metrics
+### Logs
 
-All container logs and per-container resource metrics (CPU, memory, network, disk I/O) of the swarm are collected by **Grafana Alloy** (`alloy/config.alloy`) and shipped directly to **Grafana Cloud** (Loki + Prometheus):
+Container logs are browsed live with **[Dozzle](https://github.com/amir20/dozzle)** at
+`https://logs.nu31.space` (`dozzle` service, proxied by Caddy). Logs are not shipped or stored
+anywhere: Dozzle reads them straight from the Docker API, so you see what `docker logs` keeps
+on the node.
 
-- **alloy** (`grafana/alloy`) runs in `global` mode (one instance per swarm node).
-  - Streams container stdout/stderr from the Docker API to Grafana Cloud Loki (`GRAFANA_LOKI_URL`).
-  - Exposes per-container cAdvisor metrics and remote-writes the essential container resource metrics to Grafana Cloud Prometheus (`GRAFANA_PROMETHEUS_URL`).
+- Runs in `global` mode with `DOZZLE_MODE=swarm`: one instance per node, the instances find each
+  other over the `dozzle-net` overlay network and the UI shows the containers of every node,
+  grouped by stack and service.
+- Login is the shared `USERNAME` + `PASSWORD`. The deploy workflow turns them into a
+  `users.yml` (`dozzle generate`) and passes it as the swarm secret `dozzle-users-<commit sha>`.
+  Secrets are immutable, so each deploy creates a new one; old ones can be removed with
+  `docker secret ls` / `docker secret rm` (secrets in use are refused).
 
-#### Useful LogQL queries in Grafana Cloud
+### Container Metrics
 
-```logql
-# everything of one service
-{service="infra_caddy"}
-
-# everything of the infra stack, only the lines containing "error"
-{stack="infra"} |~ "(?i)error"
-
-# how many lines per second each service produces
-sum by (service) (rate({stack="infra"}[5m]))
-```
-
-Every log line and container metric carries three labels:
+Per-container resource metrics (CPU, memory, network) are collected by **Grafana Alloy**
+(`alloy/config.alloy`, `global` mode, one instance per node) from cAdvisor and remote-written to
+**Grafana Cloud Prometheus** (`GRAFANA_PROMETHEUS_URL`). Every series carries three labels:
 
 | label     | meaning                                                            |
 | --------- | ------------------------------------------------------------------ |

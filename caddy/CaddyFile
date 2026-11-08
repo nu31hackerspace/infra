@@ -37,6 +37,10 @@ http://compass.nu31.space {
         reverse_proxy * infra_mongo-rs-viewer:8080
 }
 
+http://logs.nu31.space {
+        reverse_proxy * infra_dozzle:8080
+}
+
 http://wiki.nu31.space {
         reverse_proxy * infra_wikijs:3000
 }
