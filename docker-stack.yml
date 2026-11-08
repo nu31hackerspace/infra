@@ -103,7 +103,8 @@ services:
   # dozzle-net and the UI merges the logs of all nodes.
   dozzle:
     image: amir20/dozzle:v11.4.1
-    hostname: "{{.Node.Hostname}}"
+    # No `hostname:` override: in swarm mode Dozzle finds its own container
+    # through the hostname, which must stay the container id.
     environment:
       - DOZZLE_MODE=swarm
       - DOZZLE_AUTH_PROVIDER=simple
